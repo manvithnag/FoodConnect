@@ -1,4 +1,3 @@
-
 /* ==========================================================
    HOME PAGE (home.html)
    Hero banner, impact box, how-it-works steps and band.
@@ -57,7 +56,7 @@
 }
 
 .stat b {
-  font: 800 1.5rem 'Bricolage Grotesque';
+  font: 800 1.5rem "Bricolage Grotesque";
   color: var(--g2);
 }
 
@@ -79,7 +78,7 @@
 
 .steps div:before {
   content: counter(s);
-  font: 800 1.8rem 'Bricolage Grotesque';
+  font: 800 1.8rem "Bricolage Grotesque";
   color: var(--g2);
   display: block;
 }
@@ -93,7 +92,7 @@
 /* Headline animation */
 @media (prefers-reduced-motion: no-preference) {
   .hero h1 {
-    animation: rise .7s ease both;
+    animation: rise 0.7s ease both;
   }
 
   @keyframes rise {
@@ -137,4 +136,11 @@
     padding: 18px;
     border-radius: 14px;
   }
+}
+
+/* Keep the clickable home logo title free of link underlining. */
+body[data-page="home"] header .logo,
+body[data-page="home"] header .logo-txt,
+body[data-page="home"] header .logo-txt span {
+  text-decoration: none !important;
 }
