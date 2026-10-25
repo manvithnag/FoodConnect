@@ -35,31 +35,55 @@
     Skip to main content
   </a>
 
-  <!-- Header -->
-  <header>
+  <!-- Header and branding -->
+  <header aria-label="FoodConnect site header">
+
+    <!-- The accessible name identifies this as the FoodConnect home link -->
     <a class="logo" href="home.html" aria-label="FoodConnect home">
 
-      <img class="logo-img" src="../assets/images/logo.png" alt="" width="40" height="45">
+      <img
+        class="logo-img"
+        src="../assets/images/logo.png"
+        alt=""
+        width="40"
+        height="45">
 
-      <span class="logo-txt">Food<span>Connect</span></span>
+      <span class="logo-txt" aria-hidden="true">
+        Food<span>Connect</span>
+      </span>
     </a>
 
-    <button class="burger" id="burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="nav"
+    <!-- Mobile navigation toggle -->
+    <button
+      class="burger"
+      id="burger"
+      type="button"
+      aria-label="Open navigation menu"
+      aria-expanded="false"
+      aria-controls="nav"
       onclick="toggleMenu()">
-      <span></span>
-      <span></span>
-      <span></span>
+
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
     </button>
 
+    <!-- Navigation links are inserted by navigation.js -->
     <nav id="nav" aria-label="Main navigation"></nav>
+
   </header>
 
   <!-- Mobile navigation backdrop -->
-  <div class="backdrop" id="backdrop" aria-hidden="true" onclick="toggleMenu(false)"></div>
+  <div
+    class="backdrop"
+    id="backdrop"
+    aria-hidden="true"
+    onclick="toggleMenu(false)">
+  </div>
 
   <main id="main-content" tabindex="-1">
 
-    <!-- Homepage -->
+    <!-- Homepage content -->
     <section id="home" aria-labelledby="home-heading">
 
       <!-- Hero section -->
@@ -77,20 +101,26 @@
               and shelters that can serve it while it is fresh.
             </p>
 
-            <div class="hero-actions">
+            <div class="hero-actions" aria-label="FoodConnect actions">
+
               <a class="btn" href="register.html">
                 Donate surplus food
               </a>
 
-              <a class="btn alt" id="homeAvailableFood" href="listings.html">
+              <a
+                class="btn alt"
+                id="homeAvailableFood"
+                href="listings.html">
                 See available food
               </a>
+
             </div>
           </div>
 
           <!-- Impact statistics -->
-          <div class="plate" aria-labelledby="impact-heading">
-            <h3 id="impact-heading">Our impact so far</h3>
+          <section class="plate" aria-labelledby="impact-heading">
+
+            <h2 id="impact-heading">Our impact so far</h2>
 
             <div class="stat">
               <span>Meals shared</span>
@@ -111,14 +141,16 @@
               <span>Partner organisations</span>
               <b id="sOrgs" aria-live="polite">0</b>
             </div>
-          </div>
+
+          </section>
 
         </div>
       </div>
 
       <!-- How it works -->
-      <div class="wrap">
-        <h2>How FoodConnect works</h2>
+      <section class="wrap" aria-labelledby="how-heading">
+
+        <h2 id="how-heading">How FoodConnect works</h2>
 
         <p class="lead">
           Five simple steps from leftover food to a full stomach.
@@ -127,38 +159,49 @@
         <div class="steps">
 
           <div>
-            <b>Donor posts food</b><br>
-            Add what is available, how many it serves, and the pickup time.
+            <h3>Donor posts food</h3>
+            <p>
+              Add what is available, how many it serves, and the pickup time.
+            </p>
           </div>
 
           <div>
-            <b>Organisation browses</b><br>
-            Verified NGOs and homes see live listings.
+            <h3>Organisation browses</h3>
+            <p>
+              Verified NGOs and homes see live listings.
+            </p>
           </div>
 
           <div>
-            <b>Organisation requests</b><br>
-            One click sends a request to the donor.
+            <h3>Organisation requests</h3>
+            <p>
+              One click sends a request to the donor.
+            </p>
           </div>
 
           <div>
-            <b>Donor approves</b><br>
-            The donor accepts the request that suits best.
+            <h3>Donor approves</h3>
+            <p>
+              The donor accepts the request that suits best.
+            </p>
           </div>
 
           <div>
-            <b>Food is collected</b><br>
-            It is picked up, served, and the donor earns recognition.
+            <h3>Food is collected</h3>
+            <p>
+              It is picked up, served, and the donor earns recognition.
+            </p>
           </div>
 
         </div>
-      </div>
+      </section>
 
       <!-- Benefits for businesses -->
-      <div class="band">
+      <section class="band" aria-labelledby="benefits-heading">
+
         <div class="wrap">
 
-          <h2>Why businesses join</h2>
+          <h2 id="benefits-heading">Why businesses join</h2>
 
           <p class="lead">
             Donating is more than kindness. It builds a name people trust.
@@ -200,18 +243,23 @@
 
           </div>
         </div>
-      </div>
+      </section>
 
     </section>
   </main>
 
   <!-- Footer -->
-  <footer>
+  <footer aria-label="FoodConnect site information">
 
-    <img class="foot-logo" src="../assets/images/logo.png" alt="" width="56" height="63">
+    <img
+      class="foot-logo"
+      src="../assets/images/logo.png"
+      alt=""
+      width="56"
+      height="63">
 
     <p>
-      <b>FoodConnect</b> is a non-profit food redistribution platform.
+      <strong>FoodConnect</strong> is a non-profit food redistribution platform.
     </p>
 
     <p>
@@ -221,17 +269,33 @@
 
   </footer>
 
-  <!-- Welcome and login popup -->
-  <div class="modal" id="welcome" role="dialog" aria-modal="true" aria-labelledby="wTitle"
-    aria-describedby="wDescription" hidden>
+  <!-- Welcome and login dialog -->
+  <div
+    class="modal"
+    id="welcome"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="wTitle"
+    aria-describedby="wDescription"
+    aria-hidden="true"
+    hidden>
 
     <div class="modal-box">
 
-      <button class="modal-x" type="button" aria-label="Close login popup" onclick="closeWelcome()">
-        &times;
+      <button
+        class="modal-x"
+        type="button"
+        aria-label="Close login dialog"
+        onclick="closeWelcome()">
+        <span aria-hidden="true">&times;</span>
       </button>
 
-      <img class="modal-logo" src="../assets/images/logo.png" alt="" width="72" height="80">
+      <img
+        class="modal-logo"
+        src="../assets/images/logo.png"
+        alt=""
+        width="72"
+        height="80">
 
       <h2 id="wTitle">Welcome to FoodConnect</h2>
 
@@ -239,38 +303,59 @@
         Log in to donate or request food.
       </p>
 
-      <div class="msg" id="wMsg" role="alert" aria-atomic="true"></div>
+      <!-- Login feedback -->
+      <div
+        class="msg"
+        id="wMsg"
+        role="alert"
+        aria-atomic="true"
+        hidden>
+      </div>
 
-      <form id="wForm">
+      <form id="wForm" aria-label="FoodConnect login form">
 
-        <div class="roles" role="group" aria-label="Choose account type">
+        <fieldset class="roles">
+          <legend>Choose account type</legend>
 
           <label class="ro">
             <input type="radio" name="wrole" value="donor" checked>
-            <span>🍲<b>Donor</b></span>
+            <span aria-hidden="true">🍲</span>
+            <span>Donor</span>
           </label>
 
           <label class="ro">
             <input type="radio" name="wrole" value="recipient">
-            <span>🏛️<b>Organisation</b></span>
+            <span aria-hidden="true">🏛️</span>
+            <span>Organisation</span>
           </label>
 
           <label class="ro">
             <input type="radio" name="wrole" value="admin">
-            <span>🛡️<b>Admin</b></span>
+            <span aria-hidden="true">🛡️</span>
+            <span>Admin</span>
           </label>
 
-        </div>
+        </fieldset>
 
         <label for="wEmail">
           Email
-          <input type="email" id="wEmail" name="email" autocomplete="username" required>
         </label>
+        <input
+          type="email"
+          id="wEmail"
+          name="email"
+          autocomplete="username"
+          required>
 
         <label for="wPass">
           Password
-          <input type="password" id="wPass" name="password" autocomplete="current-password" required>
         </label>
+        <input
+          type="password"
+          id="wPass"
+          name="password"
+          autocomplete="current-password"
+          required>
 
         <button class="btn dk" type="submit">
           Log in
@@ -285,7 +370,11 @@
         </a>
       </p>
 
-      <button type="button" class="later" onclick="closeWelcome()">
+      <button
+        type="button"
+        class="later"
+        aria-label="Close login dialog and continue later"
+        onclick="closeWelcome()">
         Maybe later
       </button>
 
@@ -293,11 +382,11 @@
   </div>
 
   <!-- Shared scripts: load each file only once -->
-<script src="../scripts/common/data.js"></script>
-<script src="../scripts/common/navigation.js"></script>
-<script src="../scripts/pages/home.js"></script>
-<script src="../scripts/common/welcome.js"></script>
-<script src="../scripts/common/keyboard-shortcuts.js"></script>
-</body>
+  <script src="../scripts/common/data.js"></script>
+  <script src="../scripts/common/navigation.js"></script>
+  <script src="../scripts/pages/home.js"></script>
+  <script src="../scripts/common/welcome.js"></script>
+  <script src="../scripts/common/keyboard-shortcuts.js"></script>
 
+</body>
 </html>

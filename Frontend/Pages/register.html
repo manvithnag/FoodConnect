@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -25,12 +24,13 @@
 
 <body data-page="register">
 
-  <header>
+  <header aria-label="FoodConnect site header">
     <div class="logo"
          onclick="go('home')"
          onkeydown="if(event.key==='Enter')go('home')"
          tabindex="0"
-         role="link">
+         role="link"
+         aria-label="FoodConnect home">
       <img class="logo-img"
            src="../assets/images/logo.png"
            alt=""
@@ -41,24 +41,25 @@
 
     <button class="burger"
             id="burger"
-            aria-label="Open menu"
+            type="button"
+            aria-label="Open navigation menu"
             aria-expanded="false"
             aria-controls="nav"
             onclick="toggleMenu()">
       <span></span><span></span><span></span>
     </button>
 
-    <nav id="nav"></nav>
+    <nav id="nav" aria-label="Primary navigation"></nav>
   </header>
 
-  <div class="backdrop" id="backdrop" onclick="toggleMenu(false)"></div>
+  <div class="backdrop" id="backdrop" aria-hidden="true" onclick="toggleMenu(false)"></div>
 
-  <main>
-    <section id="register">
+  <main aria-label="FoodConnect main content">
+    <section id="register" aria-label="Create a FoodConnect account">
       <div class="wrap">
         <div class="authgrid">
 
-          <aside class="authside">
+          <aside class="authside" aria-labelledby="asTitle">
             <h2 id="asTitle">Join FoodConnect</h2>
 
             <p id="asText">
@@ -75,15 +76,17 @@
 
           <div class="authcard">
 
-            <div class="sw" role="tablist">
-              <button role="tab"
+            <div class="sw" role="tablist" aria-label="Account access options">
+              <button type="button"
+                      role="tab"
                       id="tabLogin"
                       aria-selected="false"
                       onclick="go('login')">
                 Log in
               </button>
 
-              <button role="tab"
+              <button type="button"
+                      role="tab"
                       id="tabReg"
                       class="on"
                       aria-selected="true"
@@ -92,9 +95,9 @@
               </button>
             </div>
 
-            <div class="msg" id="aMsg" role="alert"></div>
+            <div class="msg" id="aMsg" role="alert" aria-label="Registration status message"></div>
 
-            <form id="regForm" novalidate>
+            <form id="regForm" aria-label="Create account form" novalidate>
 
               <fieldset>
                 <legend>I want to join as</legend>
@@ -182,7 +185,7 @@
                 </span>
               </label>
 
-              <button class="btn dk">Create account</button>
+              <button class="btn dk" type="submit">Create account</button>
 
               <p>
                 Already registered?
@@ -200,7 +203,7 @@
     </section>
   </main>
 
-  <footer>
+  <footer aria-label="FoodConnect information">
     <img class="foot-logo"
          src="../assets/images/logo.png"
          alt="FoodConnect logo"
@@ -225,7 +228,7 @@
     <div class="modal-box">
       <button class="modal-x"
               type="button"
-              aria-label="Close"
+              aria-label="Close login dialog"
               onclick="closeWelcome()">
         &times;
       </button>
@@ -241,8 +244,8 @@
 
       <div class="msg" id="wMsg" role="alert"></div>
 
-      <form id="wForm">
-        <div class="roles">
+      <form id="wForm" aria-label="FoodConnect login form">
+        <div class="roles" role="group" aria-label="Choose account type">
           <label class="ro">
             <input type="radio" name="wrole" value="donor" checked>
             <span>🍲<b>Donor</b></span>
@@ -269,7 +272,7 @@
           <input type="password" id="wPass" autocomplete="current-password" required>
         </label>
 
-        <button class="btn dk">Log in</button>
+        <button class="btn dk" type="submit">Log in</button>
       </form>
 
       <p class="wlinks">
@@ -277,7 +280,10 @@
         <a href="register.html" onclick="closeWelcome()">Create an account</a>
       </p>
 
-      <button type="button" class="later" onclick="closeWelcome()">Maybe later</button>
+      <button type="button"
+              class="later"
+              aria-label="Close login dialog and continue later"
+              onclick="closeWelcome()">Maybe later</button>
     </div>
   </div>
 

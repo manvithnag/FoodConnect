@@ -1,4 +1,3 @@
-
 /*
  * FoodConnect - Accessible Navigation
  * Handles navigation, login state, profile, logout and mobile menu.
@@ -189,7 +188,7 @@ function toggleMenu(forceState) {
     burger.setAttribute("aria-expanded", String(shouldOpen));
     burger.setAttribute(
       "aria-label",
-      shouldOpen ? "Close menu" : "Open menu"
+      shouldOpen ? "Close navigation menu" : "Open navigation menu"
     );
 
     burger.innerHTML = shouldOpen

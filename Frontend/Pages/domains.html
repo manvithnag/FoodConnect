@@ -64,7 +64,7 @@
 
   <body data-page="domains">
     <!-- Header and navigation -->
-    <header>
+    <header aria-label="FoodConnect site header">
       <a class="logo" href="home.html" aria-label="FoodConnect home">
         <img
           class="logo-img"
@@ -79,7 +79,7 @@
       <button
         class="burger"
         id="burger"
-        aria-label="Open menu"
+        aria-label="Open navigation menu"
         aria-expanded="false"
         aria-controls="nav"
         onclick="toggleMenu()"
@@ -90,10 +90,10 @@
       <nav id="nav" aria-label="Primary navigation"></nav>
     </header>
 
-    <div class="backdrop" id="backdrop" onclick="toggleMenu(false)"></div>
+    <div class="backdrop" id="backdrop" aria-hidden="true" onclick="toggleMenu(false)"></div>
 
-    <main>
-      <section id="domains">
+    <main aria-label="FoodConnect main content">
+      <section id="domains" aria-label="Who can take part in FoodConnect">
         <div class="wrap">
           <h1>Who can take part</h1>
           <p class="lead">
@@ -101,10 +101,10 @@
             tools.
           </p>
 
-          <div class="participant-group">
+          <div class="participant-group" aria-label="Food providers and donors">
             <h2>Food providers (donors)</h2>
 
-            <div class="grid participant-grid">
+            <div class="grid participant-grid" aria-label="Types of food donors">
               <div class="card participant-card">
                 <span class="ico" aria-hidden="true">🎉</span>
                 <h3>Individuals</h3>
@@ -140,10 +140,10 @@
             </div>
           </div>
 
-          <div class="participant-group">
+          <div class="participant-group" aria-label="Food receivers and recipient organisations">
             <h2>Food receivers (recipient organisations)</h2>
 
-            <div class="grid participant-grid">
+            <div class="grid participant-grid" aria-label="Types of recipient organisations">
               <div class="card participant-card">
                 <span class="ico" aria-hidden="true">🏛️</span>
                 <h3>NGOs and charities</h3>
@@ -174,7 +174,7 @@
     </main>
 
     <!-- Footer -->
-    <footer>
+    <footer aria-label="FoodConnect information">
       <img
         class="foot-logo"
         src="../assets/images/logo.png"
@@ -197,13 +197,14 @@
       role="dialog"
       aria-modal="true"
       aria-labelledby="wTitle"
+      aria-label="FoodConnect login dialog"
       hidden
     >
       <div class="modal-box">
         <button
           class="modal-x"
           type="button"
-          aria-label="Close"
+          aria-label="Close login dialog"
           onclick="closeWelcome()"
         >
           &times;
@@ -220,10 +221,10 @@
         <h2 id="wTitle">Welcome to FoodConnect</h2>
         <p class="wsub">Log in to donate or request food.</p>
 
-        <div class="msg" id="wMsg" role="alert"></div>
+        <div class="msg" id="wMsg" role="alert" aria-label="Login error message"></div>
 
-        <form id="wForm">
-          <div class="roles">
+        <form id="wForm" aria-label="FoodConnect login form">
+          <div class="roles" role="group" aria-label="Choose account type">
             <label class="ro">
               <input type="radio" name="wrole" value="donor" checked />
               <span>🍲<b>Donor</b></span>
@@ -242,7 +243,7 @@
 
           <label>
             Email
-            <input type="email" id="wEmail" autocomplete="username" required />
+            <input type="email" id="wEmail" aria-label="Email address" autocomplete="username" required />
           </label>
 
           <label>
@@ -250,12 +251,13 @@
             <input
               type="password"
               id="wPass"
+              aria-label="Password"
               autocomplete="current-password"
               required
             />
           </label>
 
-          <button class="btn dk">Log in</button>
+          <button class="btn dk" type="submit" aria-label="Log in to FoodConnect">Log in</button>
         </form>
 
         <p class="wlinks">
@@ -263,7 +265,7 @@
           <a href="register.html" onclick="closeWelcome()">Create an account</a>
         </p>
 
-        <button type="button" class="later" onclick="closeWelcome()">
+        <button type="button" class="later" aria-label="Close login dialog and continue later" onclick="closeWelcome()">
           Maybe later
         </button>
       </div>
