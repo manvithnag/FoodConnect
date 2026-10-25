@@ -46,29 +46,73 @@ function registrationFieldMessage(input) {
 
   switch (input.id) {
     case "rName":
-      return input.value.trim() ? "" : "Enter your name or business name.";
+      return input.value.trim()
+        ? ""
+        : "Enter your name or business name.";
+
     case "rEmail":
-      if (!input.value.trim()) return "Enter your email address.";
-      return input.validity.valid ? "" : "Enter a valid email address.";
+      if (!input.value.trim()) {
+        return "Enter your email address.";
+      }
+
+      return input.validity.valid
+        ? ""
+        : "Enter a valid email address.";
+
     case "rPhone":
-      if (!input.value.trim()) return "Enter your phone number.";
-      return /^\d{10}$/.test(input.value.trim())
+      if (!input.value.trim()) {
+        return "Enter your phone number.";
+      }
+
+      return /^[6-9]\d{9}$/.test(input.value.trim())
         ? ""
-        : "Enter exactly 10 digits.";
+        : "Enter 10 digits starting with 6.";
+
     case "rCity":
-      return input.value.trim() ? "" : "Enter your city or area.";
-    case "rPass":
-      if (!input.value) return "Enter a password.";
-      return input.value.length >= 6
+      return input.value.trim()
         ? ""
-        : "Password must be at least 6 characters.";
+        : "Enter your city or area.";
+
+    case "rPass": {
+      const password = input.value;
+
+      if (password.length < 8) {
+        return "Use at least 8 characters.";
+      }
+
+      if (!/[A-Z]/.test(password)) {
+        return "Add an uppercase letter (A-Z).";
+      }
+
+      if (!/[a-z]/.test(password)) {
+        return "Add a lowercase letter (a-z).";
+      }
+
+      if (!/[0-9]/.test(password)) {
+        return "Add a number (0-9).";
+      }
+
+      if (!/[^A-Za-z0-9\s]/.test(password)) {
+        return "Add a special character.";
+      }
+
+      return "";
+    }
+
     case "rPass2":
-      if (!input.value) return "Confirm your password.";
+      if (!input.value) {
+        return "";
+      }
+
       return input.value === registrationPassword?.value
         ? ""
         : "Passwords do not match.";
+
     case "rTerms":
-      return input.checked ? "" : "Accept the food safety terms to continue.";
+      return input.checked
+        ? ""
+        : "Accept the food safety terms to continue.";
+
     default:
       return "";
   }
@@ -84,25 +128,16 @@ function updatePasswordStrength() {
   if (!registrationPassword || !passwordStrength) return;
 
   const value = registrationPassword.value;
-  if (!value) {
-    passwordStrength.textContent = "Use at least 6 characters.";
-    passwordStrength.dataset.strength = "";
-    return;
-  }
 
-  const checks = [
-    value.length >= 6,
-    value.length >= 10,
-    /[a-z]/.test(value) && /[A-Z]/.test(value),
-    /\d/.test(value),
-    /[^A-Za-z0-9]/.test(value),
-  ];
-  const score = checks.filter(Boolean).length;
-  const strength =
-    value.length < 6 || score <= 2 ? "weak" : score <= 4 ? "medium" : "strong";
+  const valid =
+    value.length >= 8 &&
+    /[A-Z]/.test(value) &&
+    /[a-z]/.test(value) &&
+    /[0-9]/.test(value) &&
+    /[^A-Za-z0-9\s]/.test(value);
 
-  passwordStrength.textContent = `${strength[0].toUpperCase()}${strength.slice(1)} password`;
-  passwordStrength.dataset.strength = strength;
+  passwordStrength.textContent = valid ? "Strong password" : "";
+  passwordStrength.dataset.strength = valid ? "strong" : "";
 }
 
 if (registerForm) {
@@ -118,16 +153,34 @@ if (registerForm) {
 
   registrationFields.forEach((input) => {
     const eventName = input.type === "checkbox" ? "change" : "input";
+
     input.addEventListener(eventName, () => {
       validateRegistrationField(input);
-      if (registerMessage) registerMessage.style.display = "none";
+
+      if (registerMessage) {
+        registerMessage.style.display = "none";
+      }
+
       if (input === registrationPassword) {
         updatePasswordStrength();
+
         const confirmPassword = $("#rPass2");
-        if (confirmPassword?.value) validateRegistrationField(confirmPassword);
+
+        if (confirmPassword?.value) {
+          validateRegistrationField(confirmPassword);
+        }
       }
     });
-    input.addEventListener("blur", () => validateRegistrationField(input));
+
+    input.addEventListener("blur", () => {
+      validateRegistrationField(input);
+    });
+
+    if (input === registrationPassword) {
+      input.addEventListener("focus", () => {
+        validateRegistrationField(input);
+      });
+    }
   });
 
   updatePasswordStrength();
@@ -143,14 +196,17 @@ if (registerForm) {
     const password = $("#rPass")?.value;
     const confirmPassword = $("#rPass2")?.value;
 
-    const selectedRole = document.querySelector('input[name="rrole"]:checked');
+    const selectedRole = document.querySelector(
+      'input[name="rrole"]:checked'
+    );
 
     const accountType = $("#rType")?.value;
     const termsAccepted = $("#rTerms")?.checked;
 
     const invalidFields = registrationFields.filter(
-      (input) => !validateRegistrationField(input),
+      (input) => !validateRegistrationField(input)
     );
+
     if (
       invalidFields.length ||
       !selectedRole ||
@@ -166,7 +222,9 @@ if (registerForm) {
       return;
     }
 
-    const submitButton = registerForm.querySelector('button[type="submit"]');
+    const submitButton = registerForm.querySelector(
+      'button[type="submit"]'
+    );
 
     if (submitButton) {
       submitButton.disabled = true;
@@ -196,18 +254,19 @@ if (registerForm) {
         msg(
           registerMessage,
           result.message || "Registration successful! You can now log in.",
-          false,
+          false
         );
       }
 
       registerForm.reset();
       updateRegistrationFields();
+
       registrationFields.forEach((input) =>
-        setRegistrationFieldError(input, ""),
+        setRegistrationFieldError(input, "")
       );
+
       updatePasswordStrength();
 
-      // Navigate to the login page after successful registration.
       window.setTimeout(() => {
         window.location.href = "login.html";
       }, 1200);
@@ -216,7 +275,7 @@ if (registerForm) {
         msg(
           registerMessage,
           error.message || "Registration failed. Please try again.",
-          true,
+          true
         );
       }
     } finally {
@@ -253,6 +312,5 @@ const accountTypeSelect = $("#rType");
 
 if (accountTypeSelect) {
   accountTypeSelect.addEventListener("change", updateRegistrationFields);
-
   updateRegistrationFields();
 }

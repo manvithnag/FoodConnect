@@ -95,8 +95,25 @@ function showWelcomeMessage(message, isError = true) {
   const messageElement = document.getElementById("wMsg");
   if (!messageElement) return;
 
-  messageElement.textContent = message;
-  messageElement.style.display = message ? "block" : "none";
+  const text = String(message || "").trim();
+
+  // Hide the message completely when there is no text.
+  if (!text) {
+    messageElement.textContent = "";
+    messageElement.hidden = true;
+    messageElement.style.display = "none";
+    messageElement.style.padding = "0";
+    messageElement.style.margin = "0";
+    messageElement.style.border = "0";
+    return;
+  }
+
+  messageElement.textContent = text;
+  messageElement.hidden = false;
+  messageElement.style.display = "block";
+  messageElement.style.padding = "10px 12px";
+  messageElement.style.borderRadius = "6px";
+  messageElement.style.marginBottom = "12px";
 
   if (isError) {
     messageElement.setAttribute("role", "alert");
@@ -109,10 +126,6 @@ function showWelcomeMessage(message, isError = true) {
     messageElement.style.backgroundColor = "#dcfce7";
     messageElement.style.border = "1px solid #16a34a";
   }
-
-  messageElement.style.padding = "10px 12px";
-  messageElement.style.borderRadius = "6px";
-  messageElement.style.marginBottom = "12px";
 }
 
 function normalizeWelcomeRole(role) {

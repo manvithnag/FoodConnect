@@ -7,10 +7,10 @@
 // Load homepage impact statistics.
 async function loadHomeStats() {
   const statElements = {
-    meals: $("#sMeals"),
-    donations: $("#sDon"),
-    donors: $("#sDonors"),
-    organisations: $("#sOrgs"),
+    meals: document.querySelector("#sMeals"),
+    donations: document.querySelector("#sDon"),
+    donors: document.querySelector("#sDonors"),
+    organisations: document.querySelector("#sOrgs"),
   };
 
   const elements = Object.values(statElements).filter(Boolean);
@@ -74,6 +74,7 @@ async function setupHomeAccess() {
 
 // Initialize homepage features.
 document.addEventListener("DOMContentLoaded", () => {
+  console.log("Home page initialized");
   loadHomeStats();
   setupHomeAccess();
 });

@@ -1,22 +1,19 @@
-
 <?php
 header('Content-Type: application/json; charset=utf-8');
 
 require_once __DIR__ . '/../db.php';
 
 try {
-    $meals = (int) $pdo->query(
-        "SELECT COUNT(*) FROM food_listings WHERE status = 'completed'"
-    )->fetchColumn();
+    // Keep meals and completed donations at zero for now.
+    $meals = 0;
+    $donations = 0;
 
-    $donations = (int) $pdo->query(
-        "SELECT COUNT(*) FROM food_listings WHERE status = 'completed'"
-    )->fetchColumn();
-
+    // Count registered donor accounts.
     $donors = (int) $pdo->query(
         "SELECT COUNT(*) FROM users WHERE role = 'donor'"
     )->fetchColumn();
 
+    // Count registered organisation accounts.
     $organisations = (int) $pdo->query(
         "SELECT COUNT(*) FROM users WHERE role = 'organisation'"
     )->fetchColumn();
