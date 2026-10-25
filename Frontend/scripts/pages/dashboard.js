@@ -10,56 +10,47 @@ let incomingRequestPollingStarted = false;
 
 async function loadDashboard() {
   if (!dashboardBody) return;
-
   dashboardBody.textContent = "Loading your dashboard...";
-
   try {
     const result = await apiRequest("dashboard.php");
     const user = result.user || {};
     const role = user.role || "";
-
     dashboardBody.replaceChildren();
 
     const heading = document.createElement("h1");
     heading.textContent = `Welcome, ${user.name || "User"}!`;
     dashboardBody.appendChild(heading);
-
     const description = document.createElement("p");
     description.className = "lead";
     description.textContent = `Account type: ${role}`;
     dashboardBody.appendChild(description);
 
     if (role === "donor") {
-      const donations = getDonorDonationData(result);
-      const suppliedStats = result.stats || result.statistics || {};
-      renderDonorStatistics(donations, suppliedStats, user);
+      const donations = Array.isArray(result.donations) ? result.donations : getDonorDonationData(result);
+      const stats = result.stats || result.statistics || {};
+      renderDonorStatistics(donations, stats, user);
+      renderDonationHistory(donations);
       renderDonorForm();
       renderDonorCertificate(user.name || "FoodConnect Donor");
-      const incomingRequests = getIncomingRequests(result);
-      renderIncomingRequestPopup(incomingRequests);
+      renderIncomingRequestPopup(getIncomingRequests(result));
       startIncomingRequestPolling();
     } else if (role === "organisation") {
-      renderOrganisationDashboard();
+      renderOrganisationDashboard(result.organisation_requests || result.organization_requests || []);
     } else {
       const message = document.createElement("p");
-      message.textContent =
-        "Your account does not have a supported dashboard role.";
+      message.textContent = "Your account does not have a supported dashboard role.";
       dashboardBody.appendChild(message);
     }
   } catch (error) {
     dashboardBody.replaceChildren();
-
     const heading = document.createElement("h2");
     heading.textContent = "Dashboard unavailable";
-
     const message = document.createElement("p");
     message.textContent = error.message || "Please log in and try again.";
-
     const loginLink = document.createElement("a");
     loginLink.href = "login.html";
     loginLink.textContent = "Go to Login";
     loginLink.className = "btn";
-
     dashboardBody.append(heading, message, loginLink);
   }
 }
@@ -169,6 +160,80 @@ function renderDonorStatistics(donations, suppliedStats, user = {}) {
   dashboardBody.appendChild(section);
 }
 
+function renderDonationHistory(donations) {
+  const section = document.createElement("section");
+  section.className = "card dash-panel donation-history-panel";
+  const heading = document.createElement("h2");
+  heading.textContent = "Donation History";
+  const description = document.createElement("p");
+  description.textContent = "All food listings you have added and their current status.";
+  section.append(heading, description);
+
+  if (!donations.length) {
+    const empty = document.createElement("p");
+    empty.className = "empty-state";
+    empty.textContent = "You haven't added any food donations yet.";
+    section.appendChild(empty);
+    dashboardBody.appendChild(section);
+    return;
+  }
+
+  const wrap = document.createElement("div");
+  wrap.className = "dashboard-table-wrap";
+  const table = document.createElement("table");
+  const thead = document.createElement("thead");
+  const headRow = document.createElement("tr");
+  ["Food donation", "Date added", "Status"].forEach((text) => {
+    const th = document.createElement("th"); th.scope = "col"; th.textContent = text; headRow.appendChild(th);
+  });
+  thead.appendChild(headRow);
+  const tbody = document.createElement("tbody");
+  donations.forEach((item) => {
+    const row = document.createElement("tr");
+    const title = document.createElement("td"); title.textContent = item.title || item.food_name || "Food donation";
+    const date = document.createElement("td"); date.textContent = formatDashboardDate(item.donation_date || item.created_at || item.date);
+    const status = document.createElement("td");
+    const raw = String(item.display_status || item.history_status || item.status_label || "pending").toLowerCase();
+    status.textContent = raw === "completed" ? "Completed" : raw === "awaiting confirmation" ? "Awaiting donor confirmation" : raw === "requested" ? "Awaiting donor confirmation" : raw === "rejected" ? "Rejected" : raw === "expired" ? "Expired" : "Pending";
+    status.className = `status-cell status-${raw.replace(/[^a-z]+/g, "-")}`;
+    row.append(title, date, status); tbody.appendChild(row);
+  });
+  table.append(thead, tbody); wrap.appendChild(table); section.appendChild(wrap);
+  const statsPanel = dashboardBody.querySelector(".donor-statistics");
+  if (statsPanel) statsPanel.after(section); else dashboardBody.appendChild(section);
+}
+
+function formatDashboardDate(value) {
+  if (!value) return "—";
+  const date = new Date(String(value).replace(" ", "T"));
+  return Number.isNaN(date.getTime()) ? String(value) : new Intl.DateTimeFormat(undefined, { year: "numeric", month: "short", day: "numeric" }).format(date);
+}
+
+function showListingSuccessPopup(data, response) {
+  const overlay = document.createElement("div");
+  overlay.className = "request-confirm-overlay listing-success-overlay";
+  overlay.setAttribute("role", "dialog");
+  overlay.setAttribute("aria-modal", "true");
+  overlay.setAttribute("aria-labelledby", "listingSuccessTitle");
+  const dialog = document.createElement("section"); dialog.className = "request-confirm-dialog listing-success-dialog";
+  const heading = document.createElement("h2"); heading.id = "listingSuccessTitle"; heading.textContent = "Food listing added successfully!";
+  const intro = document.createElement("p"); intro.textContent = response.message || "Your food donation is now listed on FoodConnect.";
+  const details = document.createElement("dl"); details.className = "listing-success-details";
+  [["Food name", data.title], ["Category", data.kind === "non-veg" ? "Non-Veg" : "Veg"], ["Quantity / servings", data.qty], ["Pickup address", data.addr], ["Collect before", formatDashboardDateTime(data.collect_before)], ["Status", "Pending — waiting for an organisation request"]].forEach(([labelText, value]) => {
+    const dt = document.createElement("dt"); dt.textContent = labelText;
+    const dd = document.createElement("dd"); dd.textContent = value || "—";
+    details.append(dt, dd);
+  });
+  const close = document.createElement("button"); close.type = "button"; close.className = "btn dk"; close.textContent = "Done"; close.addEventListener("click", () => overlay.remove());
+  dialog.append(heading, intro, details, close); overlay.appendChild(dialog); document.body.appendChild(overlay); close.focus();
+}
+
+function formatDashboardDateTime(value) {
+  if (!value) return "—";
+  const date = new Date(String(value).replace(" ", "T"));
+  return Number.isNaN(date.getTime()) ? String(value) : new Intl.DateTimeFormat(undefined, { year: "numeric", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }).format(date);
+}
+
 function getRequestKey(request) {
   return String(request.request_id ?? request.requestId ?? request.id ?? request.id_request ??
     request.listing_id ?? request.listingId ?? request.food_id ?? "");
@@ -241,6 +306,9 @@ function renderIncomingRequestPopup(requests) {
   requests.forEach((request) => {
     const card = document.createElement("article");
     card.className = "incoming-request-card";
+    const cardFoodId = request.listing_id ?? request.listingId ?? request.food_id ?? request.foodId ?? "";
+    card.dataset.foodId = String(cardFoodId).trim();
+    card.dataset.listingId = String(cardFoodId).trim();
 
     const foodName = document.createElement("h3");
     foodName.textContent = request.food_name || request.title || request.listing_title || request.foodTitle || "Food donation";
@@ -288,23 +356,46 @@ function renderIncomingRequestPopup(requests) {
           }),
         });
         statusMessage.textContent = response.message || (action === "confirm" ? "Donation confirmed." : "Request rejected.");
-        card.remove();
 
-        // Count only confirmed donations, never listings that were merely published.
         if (action === "confirm") {
-          const totalCell = dashboardBody.querySelector("[data-total-donations='true']");
-          if (totalCell) {
-            const current = Number.parseInt(totalCell.textContent, 10);
-            if (Number.isFinite(current)) totalCell.textContent = String(current + 1);
+          const acceptedFoodId = String(listingId ?? request.food_id ?? request.foodId ?? "").trim();
+          // Remove all cards for the food item accepted by the donor.
+          if (acceptedFoodId) {
+            dialog.querySelectorAll(".incoming-request-card").forEach((requestCard) => {
+              const cardFoodId = String(
+                requestCard.dataset.foodId ||
+                requestCard.dataset.listingId ||
+                requestCard.getAttribute("data-food-id") ||
+                ""
+              ).trim();
+              if (cardFoodId === acceptedFoodId) requestCard.remove();
+            });
           }
+          card.remove();
+        } else {
+          card.remove();
+        }
+
+        // Refresh server-backed totals and history after a successful action.
+        if (action === "confirm") {
+          try {
+            const fresh = await apiRequest("dashboard.php");
+            const stats = fresh.stats || {};
+            const totalCell = dashboardBody.querySelector("[data-total-donations='true']");
+            if (totalCell && stats.total_donations !== undefined) totalCell.textContent = String(stats.total_donations);
+            const rankCell = dashboardBody.querySelector("[data-donor-rank='true']");
+            if (rankCell) rankCell.textContent = stats.donor_rank ? `#${stats.donor_rank}` : "Not ranked yet";
+            const historyBody = dashboardBody.querySelector(".donation-history-panel tbody");
+            if (historyBody && Array.isArray(fresh.donations)) {
+              historyBody.closest(".donation-history-panel").remove();
+              const statsSection = dashboardBody.querySelector(".donor-statistics");
+              if (statsSection) statsSection.after();
+              renderDonationHistory(fresh.donations);
+            }
+          } catch (_) { /* Next dashboard refresh will reconcile the data. */ }
         }
         if (!dialog.querySelector(".incoming-request-card")) {
-          const closeButton = document.createElement("button");
-          closeButton.type = "button";
-          closeButton.className = "btn dk";
-          closeButton.textContent = "Done";
-          closeButton.addEventListener("click", () => overlay.remove());
-          dialog.appendChild(closeButton);
+          overlay.remove();
         }
       } catch (error) {
         statusMessage.textContent = error.message || "Could not update this request. Please try again.";
@@ -541,9 +632,23 @@ function renderDonorForm() {
         body: JSON.stringify(data),
       });
 
-      message.textContent =
-        response.message || "Food listing published successfully!";
+      message.textContent = response.message || "Food listing published successfully!";
+      showListingSuccessPopup(data, response);
       form.reset();
+      formPanel.hidden = true;
+      toggleButton.setAttribute("aria-expanded", "false");
+      toggleButton.textContent = "＋ Add Food Listing";
+      // Reload history/stats from the backend without leaving the success popup.
+      try {
+        const fresh = await apiRequest("dashboard.php");
+        const historyPanel = dashboardBody.querySelector(".donation-history-panel");
+        if (historyPanel && Array.isArray(fresh.donations)) {
+          historyPanel.remove();
+          const statsPanel = dashboardBody.querySelector(".donor-statistics");
+          if (statsPanel) statsPanel.after();
+          renderDonationHistory(fresh.donations);
+        }
+      } catch (_) { /* Listing success popup already confirms the saved listing. */ }
 
     } catch (error) {
       message.textContent =
@@ -554,23 +659,36 @@ function renderDonorForm() {
   });
 }
 
-function renderOrganisationDashboard() {
+function renderOrganisationDashboard(requests) {
   const section = document.createElement("section");
-  section.className = "card";
-
-  const heading = document.createElement("h2");
-  heading.textContent = "Find Available Food";
-
-  const description = document.createElement("p");
-  description.textContent =
-    "Browse food available for collection and submit a request.";
-
-  const link = document.createElement("a");
-  link.href = "listings.html";
-  link.className = "btn dk";
-  link.textContent = "Browse Food Listings";
-
+  section.className = "card dash-panel organisation-requests-panel";
+  const heading = document.createElement("h2"); heading.textContent = "Your Food Requests";
+  const description = document.createElement("p"); description.textContent = "Track every food donation you have requested and whether the donor has accepted it.";
+  const link = document.createElement("a"); link.href = "listings.html"; link.className = "btn dk"; link.textContent = "Browse Available Food";
   section.append(heading, description, link);
+
+  if (!requests.length) {
+    const empty = document.createElement("p"); empty.className = "empty-state"; empty.textContent = "You haven't requested any food donations yet."; section.appendChild(empty);
+  } else {
+    const wrap = document.createElement("div"); wrap.className = "dashboard-table-wrap";
+    const table = document.createElement("table"); const thead = document.createElement("thead"); const hr = document.createElement("tr");
+    ["Food donation", "Donor", "Quantity", "Requested on", "Status"].forEach((label) => { const th = document.createElement("th"); th.scope = "col"; th.textContent = label; hr.appendChild(th); });
+    thead.appendChild(hr); const tbody = document.createElement("tbody");
+    requests.forEach((request) => {
+      const tr = document.createElement("tr");
+      const food = document.createElement("td"); food.textContent = request.food_name || request.title || "Food donation";
+      const donor = document.createElement("td"); donor.textContent = request.donor_name || "FoodConnect donor";
+      const qty = document.createElement("td"); qty.textContent = request.qty || "—";
+      const date = document.createElement("td"); date.textContent = formatDashboardDate(request.requested_at || request.created_at);
+      const status = document.createElement("td");
+      const raw = String(request.status || "pending").toLowerCase();
+      const labels = { pending: "Awaiting donor confirmation", approved: "Accepted by donor", completed: "Completed", rejected: "Rejected by donor", cancelled: "Cancelled" };
+      status.textContent = labels[raw] || raw;
+      status.className = `status-cell status-${raw}`;
+      tr.append(food, donor, qty, date, status); tbody.appendChild(tr);
+    });
+    table.append(thead, tbody); wrap.appendChild(table); section.appendChild(wrap);
+  }
   dashboardBody.appendChild(section);
 }
 
