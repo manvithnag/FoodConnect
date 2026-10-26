@@ -1,10 +1,7 @@
-
 /* ==========================================================
-   HALL OF FAME PAGE (fame.html) - tier cards and ranked donor rows.
-   (Badge colours are in components/badges.css.)
+   HALL OF FAME PAGE - donor tiers and ranked donor cards.
    ========================================================== */
 
-/* HALL OF FAME: tier cards */
 .tier {
   border-top: 6px solid var(--c);
   text-align: center;
@@ -14,68 +11,105 @@
   font-size: 2.4rem;
 }
 
-/* HALL OF FAME: ranked donor rows */
-.fame {
+.fame-ranking {
   display: grid;
   gap: 12px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
-.fr {
-  display: flex;
+.fame-row {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) auto;
   align-items: center;
   gap: 16px;
+  min-width: 0;
+  padding: 14px 18px;
   background: var(--w);
   border: 1px solid var(--line);
   border-radius: 14px;
-  padding: 14px 18px;
+  box-shadow: 0 4px 14px rgb(20 50 35 / 5%);
+}
+
+.fame-rank {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #edf2ee;
+  color: var(--g);
+  font: 800 1.2rem 'Bricolage Grotesque', sans-serif;
+}
+
+.fame-details {
+  min-width: 0;
+}
+
+.fame-name {
+  margin: 0 0 4px;
+  color: var(--g);
+  font: 700 1.2rem/1.25 'Bricolage Grotesque', sans-serif;
+  overflow-wrap: anywhere;
+}
+
+.fame-stats {
+  display: flex;
   flex-wrap: wrap;
-}
-
-.fr .rk {
-  font: 800 1.6rem 'Bricolage Grotesque';
+  gap: 4px 16px;
+  margin: 0;
   color: var(--mut);
-  width: 36px;
+  font-size: .95rem;
 }
 
-.fr .nm {
-  flex: 1;
-  min-width: 180px;
+.fame-badge {
+  justify-self: end;
 }
 
-.fr .nm small {
+.fame-explainer {
+  margin: -4px 0 14px;
   color: var(--mut);
-  display: block;
 }
 
-/* Small-screen adjustments */
-@media (max-width: 480px) {
+.fame-empty {
+  padding: 18px;
+  color: var(--mut);
+  background: var(--w);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+
+@media (max-width: 600px) {
   .fame-wrap {
+    display: flex;
+    flex-direction: column;
     gap: 0;
   }
 
-  .fame-top-title {
-    margin-bottom: 10px !important;
-    color: var(--g);
-  }
+  .fame-top-title { order: 1; margin: 0 0 6px !important; color: var(--g); }
+  .fame-explainer { order: 2; margin: 0 0 12px; }
+  #fameList { order: 3; width: 100%; margin: 0 0 24px; }
+  .fame-title { order: 4; margin-top: 6px; }
+  .fame-intro { order: 5; }
+  .fame-tiers { order: 6; width: 100%; gap: 12px; }
 
-  #fameList {
-    width: 100%;
-  }
-
-  .fame-title {
-    margin-top: 6px;
-  }
-
-  .fame-tiers {
-    gap: 12px;
-  }
-
-  .fr {
-    gap: 10px;
+  .fame-row {
+    grid-template-columns: 38px minmax(0, 1fr);
+    gap: 10px 12px;
     padding: 12px;
   }
 
-  .fr .nm {
-    min-width: 140px;
+  .fame-rank {
+    grid-row: 1 / span 2;
+    align-self: start;
+    width: 36px;
+    height: 36px;
+    font-size: 1rem;
   }
+
+  .fame-details { grid-column: 2; }
+  .fame-name { font-size: 1.05rem; }
+  .fame-stats { gap: 4px 10px; font-size: .9rem; }
+  .fame-badge { grid-column: 2; justify-self: start; }
 }

@@ -1,133 +1,57 @@
-
 /* ==========================================================
-   FOODCONNECT RESPONSIVE LAYOUT
-   Responsive page layouts, forms and mobile adjustments
+   RESPONSIVE CSS
+   Additional responsive rules for FoodConnect pages
    ========================================================== */
 
-/* Prevent horizontal overflow */
-html {
+/* Prevent oversized content from breaking layouts */
+img,
+video,
+iframe {
   max-width: 100%;
-  overflow-x: clip;
 }
 
-body {
-  width: 100%;
-  min-width: 320px;
-  overflow-x: clip;
-}
-
-img {
+button,
+input,
+select,
+textarea {
   max-width: 100%;
-  height: auto;
 }
 
-/* Desktop navbar: Available food -> Profile -> Logout */
-/* Desktop navbar: Available food -> Profile -> Logout */
-@media (min-width: 801px) {
-  header {
-    display: flex;
-    align-items: center;
+/* Tablet screens */
+@media (max-width: 900px) {
+  .wrap {
+    padding: 44px 5%;
   }
 
-  header nav {
-    display: flex;
-    align-items: center;
+  h2 {
+    font-size: 1.8rem;
   }
 
-  header nav .profile-menu-link {
-    display: none;
+  .lead {
+    max-width: 100%;
   }
 
-  header .profile-icon-link {
-    order: 1;
-    margin-left: 0;
-    margin-right: 0;
-    flex-shrink: 0;
+  .authgrid {
+    grid-template-columns: 1fr;
+    gap: 24px;
   }
 
-  header nav .logout-btn {
-    margin-left: 0;
-    flex-shrink: 0;
+  .authside,
+  .authcard {
+    min-width: 0;
   }
 }
 
-/* Tablet and smaller laptops */
-@media (max-width: 1024px) {
-  .hero {
-    padding: 64px 5%;
-  }
-
-  .hero .in {
-    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
-    gap: 28px;
-  }
-
-  .hero h1 {
-    font-size: clamp(2.4rem, 5vw, 3.5rem);
-  }
-
-  .hero p {
-    font-size: 1.05rem;
-  }
-
-  .plate {
-    padding: 24px;
+/* Mobile screens */
+@media (max-width: 600px) {
+  body {
+    font-size: 16px;
   }
 
   .wrap {
-    width: 90%;
-    max-width: 100%;
-    margin-inline: auto;
+    padding: 32px 5%;
   }
 
-  .steps {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-/* Mobile and tablet layouts */
-@media (max-width: 768px) {
-  *,
-  *::before,
-  *::after {
-    box-sizing: border-box;
-  }
-
-  /* Keep the navbar compact on mobile.
-     Colours and menu styling are controlled by layout.css. */
-  header {
-    width: 100%;
-    min-height: 68px;
-    padding: 10px 16px;
-    gap: 12px;
-  }
-
-  .logo {
-    min-width: 0;
-    max-width: calc(100% - 100px);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-shrink: 1;
-  }
-
-  .logo-img {
-    width: 36px;
-    height: 40px;
-    object-fit: contain;
-    flex-shrink: 0;
-  }
-
-  .logo-txt {
-    font-size: clamp(1.1rem, 4.5vw, 1.4rem);
-    white-space: nowrap;
-  }
-
-  /* Login and registration forms */
   #login .wrap,
   #register .wrap {
     padding: 16px 6% 24px;
@@ -147,6 +71,34 @@ img {
     display: none !important;
   }
 
+  /* Keep Top donors above Hall of Fame on standard phone widths. */
+  .fame-wrap {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .fame-top-title {
+    order: 1;
+  }
+  .fame-explainer {
+    order: 2;
+  }
+  #fameList {
+    order: 3;
+    width: 100%;
+    margin-bottom: 24px;
+  }
+  .fame-title {
+    order: 4;
+  }
+  .fame-intro {
+    order: 5;
+  }
+  .fame-tiers {
+    order: 6;
+    width: 100%;
+  }
+
   .authcard {
     padding: 17px 15px;
   }
@@ -164,36 +116,6 @@ img {
     padding: 11px;
   }
 
-  /* Hall of Fame ordering on mobile */
-  .fame-wrap {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .fame-top-title {
-    order: 1;
-  }
-
-  #fameList {
-    order: 2;
-    width: 100%;
-    margin-bottom: 24px;
-  }
-
-  .fame-title {
-    order: 3;
-  }
-
-  .fame-intro {
-    order: 4;
-  }
-
-  .fame-tiers {
-    order: 5;
-    width: 100%;
-  }
-
-  /* Responsive headings */
   h2 {
     font-size: 1.6rem;
   }
@@ -202,249 +124,89 @@ img {
     font-size: 1.15rem;
   }
 
-  /* Hero becomes a single column */
-  .hero {
-    padding: 40px 16px;
-  }
-
-  .hero .in {
-    width: 100%;
-    max-width: 560px;
-    margin-inline: auto;
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: 28px;
-  }
-
-  .hero h1 {
-    max-width: 16ch;
-    font-size: clamp(2.2rem, 8vw, 3.2rem);
-    line-height: 1.12;
-    overflow-wrap: break-word;
-  }
-
-  .hero p {
-    max-width: 100%;
-    font-size: 1rem;
-    line-height: 1.65;
-    margin: 16px 0 24px;
-  }
-
-  .hero .btn {
-    display: flex;
-    width: 100%;
-    min-height: 46px;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    margin: 10px 0;
-  }
-
-  /* Homepage feature panel */
-  .plate {
-    width: 100%;
-    min-width: 0;
-    padding: 20px 18px;
-    border-radius: 16px;
-  }
-
-  .plate h3 {
-    font-size: 1.2rem;
-  }
-
-  .stat {
-    gap: 12px;
-    align-items: center;
-    padding: 12px 0;
-  }
-
-  .stat span {
-    min-width: 0;
-    overflow-wrap: anywhere;
-  }
-
-  .stat b {
-    flex-shrink: 0;
+  .logo-txt {
     font-size: 1.25rem;
   }
 
-  /* Page sections */
-  .wrap {
-    width: 100%;
-    max-width: 560px;
-    padding: 36px 16px;
-    margin-inline: auto;
+  .logo-img {
+    width: 34px;
+    height: 38px;
   }
 
-  .steps {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 14px;
+  /* Buttons */
+  .btn {
+    padding: 11px 16px;
   }
 
-  .grid {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 16px;
+  .btn.alt {
+    margin-left: 0;
   }
 
-  .card {
-    min-width: 0;
+  /* Stack hero buttons when needed */
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
   }
 
-  /* Footer */
-  footer {
-    padding: 32px 18px;
-    text-align: center;
-  }
-
-  footer p {
-    max-width: 100%;
-    overflow-wrap: anywhere;
-  }
-
-  /* Forms and content panels */
-  form,
-  .form-card,
-  .panel,
-  .card {
-    max-width: 100%;
-  }
-
-  input,
-  select,
-  textarea,
-  button {
-    max-width: 100%;
-  }
-
-  /* Tables can scroll instead of breaking the page */
+  /* Prevent tables from forcing the page wider */
   .table-wrap {
     width: 100%;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }
+
+  table {
+    min-width: 520px;
+    border-collapse: collapse;
+  }
+
+  /* Keep long words and URLs inside cards */
+  .card,
+  .authcard,
+  .authside {
+    overflow-wrap: anywhere;
+  }
+
+  /* Form buttons fit smaller screens */
+  form > .btn {
+    width: 100%;
+  }
+
+  /* Footer spacing */
+  footer {
+    font-size: 0.95rem;
+  }
 }
 
-/* Small phones */
-@media (max-width: 380px) {
-  header {
-    padding-inline: 12px;
-    gap: 8px;
-  }
-
-  .logo {
-    gap: 6px;
-    max-width: calc(100% - 90px);
-  }
-
-  .logo-img {
-    width: 32px;
-    height: 36px;
+/* Very small mobile screens */
+@media (max-width: 360px) {
+  .wrap {
+    padding: 26px 4%;
   }
 
   .logo-txt {
-    font-size: 1.05rem;
+    font-size: 1.1rem;
   }
 
-  .hero {
-    padding: 32px 14px;
+  .burger {
+    width: 38px;
+    height: 38px;
   }
 
-  .hero h1 {
-    font-size: 2.1rem;
-  }
-
-  .plate {
-    padding: 18px 14px;
-  }
-
-  .wrap {
-    padding-inline: 14px;
+  .btn {
+    width: 100%;
+    text-align: center;
   }
 }
 
-/* Accessibility: skip navigation */
-.skip-link {
-  position: absolute;
-  top: 8px;
-  left: 8px;
-  z-index: 20000;
-  padding: 10px 14px;
-  background: #ffffff;
-  color: #17624b;
-  border: 2px solid #17624b;
-  border-radius: 6px;
-  font-weight: 700;
-  transform: translateY(-150%);
-}
+/* Landscape phones with limited vertical space */
+@media (max-height: 500px) and (max-width: 900px) {
+  .modal {
+    align-items: flex-start;
+  }
 
-.skip-link:focus {
-  transform: translateY(0);
-}
-
-/* Visible keyboard focus */
-a:focus-visible,
-button:focus-visible,
-input:focus-visible,
-select:focus-visible {
-  outline: 3px solid #f5b82e;
-  outline-offset: 3px;
-}
-
-/* Accessibility: skip link */
-.skip-link {
-  position: absolute;
-  top: 8px;
-  left: 8px;
-  z-index: 20000;
-  padding: 10px 14px;
-  background: #fff;
-  color: #17624b;
-  border: 2px solid #17624b;
-  border-radius: 6px;
-  font-weight: 700;
-  transform: translateY(-160%);
-}
-
-.skip-link:focus {
-  transform: translateY(0);
-}
-
-/* Visible keyboard focus */
-a:focus-visible,
-button:focus-visible,
-input:focus-visible,
-select:focus-visible,
-textarea:focus-visible,
-[tabindex="-1"]:focus-visible {
-  outline: 3px solid #f5b82e;
-  outline-offset: 3px;
-}
-
-/* Keep focus visible on the main content after using Skip link */
-#main-content:focus {
-  outline: none;
-}
-
-/* Use a clear label/value layout for impact statistics */
-.impact-stats {
-  margin: 0;
-  padding: 0;
-}
-
-.impact-stats .stat dt,
-.impact-stats .stat dd {
-  margin: 0;
-}
-
-/* Reduced motion */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    scroll-behavior: auto !important;
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+  .modal-box {
+    max-height: calc(100vh - 24px);
   }
 }
-

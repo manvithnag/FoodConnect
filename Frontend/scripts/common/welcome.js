@@ -1,4 +1,3 @@
-
 /*
  * FoodConnect - Accessible Welcome Modal
  * Handles login, keyboard accessibility and session checks.
@@ -46,6 +45,7 @@ function openWelcome() {
 
   if (isOpening) {
     const activeElement = document.activeElement;
+
     previousFocus =
       activeElement && activeElement !== document.body
         ? activeElement
@@ -90,17 +90,41 @@ function closeWelcome() {
   }
 }
 
+/* Display errors in red and success messages in green. */
 function showWelcomeMessage(message, isError = true) {
   const messageElement = document.getElementById("wMsg");
   if (!messageElement) return;
 
-  messageElement.textContent = message;
-  messageElement.style.display = message ? "block" : "none";
+  const text = String(message || "").trim();
+
+  // Hide the message completely when there is no text.
+  if (!text) {
+    messageElement.textContent = "";
+    messageElement.hidden = true;
+    messageElement.style.display = "none";
+    messageElement.style.padding = "0";
+    messageElement.style.margin = "0";
+    messageElement.style.border = "0";
+    return;
+  }
+
+  messageElement.textContent = text;
+  messageElement.hidden = false;
+  messageElement.style.display = "block";
+  messageElement.style.padding = "10px 12px";
+  messageElement.style.borderRadius = "6px";
+  messageElement.style.marginBottom = "12px";
 
   if (isError) {
     messageElement.setAttribute("role", "alert");
+    messageElement.style.color = "#b91c1c";
+    messageElement.style.backgroundColor = "#fee2e2";
+    messageElement.style.border = "1px solid #dc2626";
   } else {
     messageElement.setAttribute("role", "status");
+    messageElement.style.color = "#166534";
+    messageElement.style.backgroundColor = "#dcfce7";
+    messageElement.style.border = "1px solid #16a34a";
   }
 }
 
@@ -123,6 +147,7 @@ async function handleWelcomeLogin(event) {
   const emailInput = document.getElementById("wEmail");
   const passwordInput = document.getElementById("wPass");
   const submitButton = form.querySelector('button[type="submit"]');
+
   const selectedRole = form.querySelector(
     'input[name="wrole"]:checked'
   );
@@ -192,7 +217,8 @@ async function handleWelcomeLogin(event) {
 
   } catch (error) {
     showWelcomeMessage(
-      error.message || "Login failed. Please check your details."
+      error.message || "Login failed. Please check your details.",
+      true
     );
 
   } finally {

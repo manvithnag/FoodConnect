@@ -1,219 +1,228 @@
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Hall of Fame – FoodConnect</title>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Hall of Fame – FoodConnect</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Source+Sans+3:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link
-    href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Source+Sans+3:wght@400;600&display=swap"
-    rel="stylesheet">
+    <link rel="icon" type="image/png" href="../assets/images/logo.png" />
 
-  <link rel="icon" type="image/png" href="../assets/images/logo.png">
+    <!-- Shared styles -->
+    <link rel="stylesheet" href="../styles/common/global.css" />
+    <link rel="stylesheet" href="../styles/common/layout.css" />
+    <link rel="stylesheet" href="../styles/components/cards.css" />
+    <link rel="stylesheet" href="../styles/components/badges.css" />
 
-  <!-- Shared styles -->
-  <link rel="stylesheet" href="../styles/common/global.css">
-  <link rel="stylesheet" href="../styles/common/layout.css">
-  <link rel="stylesheet" href="../styles/components/cards.css">
-  <link rel="stylesheet" href="../styles/components/badges.css">
+    <!-- Page-specific styles -->
+    <link rel="stylesheet" href="../styles/pages/fame.css" />
 
-  <!-- Page-specific styles -->
-  <link rel="stylesheet" href="../styles/pages/fame.css">
+    <!-- Forms, popup and responsive styles -->
+    <link rel="stylesheet" href="../styles/components/forms.css" />
+    <link rel="stylesheet" href="../styles/components/welcome-modal.css" />
+    <link rel="stylesheet" href="../styles/common/responsive.css" />
+  </head>
 
-  <!-- Forms, popup and responsive styles -->
-  <link rel="stylesheet" href="../styles/components/forms.css">
-  <link rel="stylesheet" href="../styles/components/welcome-modal.css">
-  <link rel="stylesheet" href="../styles/common/responsive.css">
-</head>
+  <body data-page="fame">
+    <!-- Header -->
+    <header>
+      <div
+        class="logo"
+        onclick="go('home')"
+        onkeydown="if (event.key === 'Enter') go('home');"
+        tabindex="0"
+        role="link"
+      >
+        <img
+          class="logo-img"
+          src="../assets/images/logo.png"
+          alt=""
+          width="40"
+          height="45"
+        />
 
-<body data-page="fame">
+        <span class="logo-txt">Food<span>Connect</span></span>
+      </div>
 
-  <!-- Header -->
-  <header>
-    <div class="logo"
-         onclick="go('home')"
-         onkeydown="if(event.key==='Enter')go('home')"
-         tabindex="0"
-         role="link">
+      <button
+        class="burger"
+        id="burger"
+        aria-label="Open menu"
+        aria-expanded="false"
+        aria-controls="nav"
+        onclick="toggleMenu()"
+      >
+        <span></span><span></span><span></span>
+      </button>
 
-      <img class="logo-img"
-           src="../assets/images/logo.png"
-           alt=""
-           width="40"
-           height="45">
+      <nav id="nav"></nav>
+    </header>
 
-      <span class="logo-txt">Food<span>Connect</span></span>
-    </div>
+    <!-- Mobile menu backdrop -->
+    <div class="backdrop" id="backdrop" onclick="toggleMenu(false)"></div>
 
-    <button class="burger"
-            id="burger"
-            aria-label="Open menu"
-            aria-expanded="false"
-            aria-controls="nav"
-            onclick="toggleMenu()">
-      <span></span><span></span><span></span>
-    </button>
+    <main>
+      <section id="fame">
+        <div class="wrap fame-wrap">
+          <h2 class="fame-title">Hall of Fame</h2>
 
-    <nav id="nav"></nav>
-  </header>
+          <p class="lead fame-intro">
+            We honour the people and businesses who turn surplus into support.
+            Recognition is based on meals shared through completed donations.
+          </p>
 
-  <!-- Mobile menu backdrop -->
-  <div class="backdrop"
-       id="backdrop"
-       onclick="toggleMenu(false)"></div>
+          <!-- Donor recognition tiers -->
+          <div class="grid fame-tiers" style="margin-bottom: 34px">
+            <div class="card tier t-Bronze" style="--c: #b0713a">
+              <div class="m">🥉</div>
+              <h3>Bronze Giver</h3>
+              <p>First donation completed</p>
+            </div>
 
-  <main>
-    <section id="fame">
-      <div class="wrap fame-wrap">
+            <div class="card tier t-Silver" style="--c: #7d8a96">
+              <div class="m">🥈</div>
+              <h3>Silver Giver</h3>
+              <p>200 meals shared</p>
+            </div>
 
-        <h2 class="fame-title">Hall of Fame</h2>
+            <div class="card tier t-Gold" style="--c: #d49a0d">
+              <div class="m">🥇</div>
+              <h3>Gold Giver</h3>
+              <p>1,000 meals shared</p>
+            </div>
 
-        <p class="lead fame-intro">
-          We honour the people and businesses who turn surplus into support.
-          Recognition is based on meals shared through completed donations.
+            <div class="card tier t-Platinum" style="--c: #3f6fb5">
+              <div class="m">💎</div>
+              <h3>Platinum Champion</h3>
+              <p>3,000 meals shared</p>
+            </div>
+          </div>
+
+          <!-- Ranked donor data is loaded from the backend. -->
+          <h3 class="fame-top-title" id="topDonorsTitle">Top donors</h3>
+          <p class="fame-explainer" id="topDonorsDescription">
+            Ranked by meals served from completed donations. Meal totals use
+            numeric serving quantities.
+          </p>
+          <ol
+            class="fame-ranking"
+            id="fameList"
+            aria-labelledby="topDonorsTitle"
+            aria-describedby="topDonorsDescription"
+            aria-live="polite"
+            aria-busy="true"
+          ></ol>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+      <img
+        class="foot-logo"
+        src="../assets/images/logo.png"
+        alt="FoodConnect logo"
+        width="56"
+        height="63"
+      />
+
+      <p><b>FoodConnect</b> is a non-profit food redistribution platform.</p>
+
+      <p>
+        Reduce food waste. Increase social impact. Connect surplus food with
+        those who need it most.
+      </p>
+    </footer>
+
+    <!-- Welcome login popup -->
+    <div
+      class="modal"
+      id="welcome"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="wTitle"
+      hidden
+    >
+      <div class="modal-box">
+        <button
+          class="modal-x"
+          type="button"
+          aria-label="Close"
+          onclick="closeWelcome()"
+        >
+          &times;
+        </button>
+
+        <img
+          class="modal-logo"
+          src="../assets/images/logo.png"
+          alt="FoodConnect logo"
+          width="72"
+          height="80"
+        />
+
+        <h2 id="wTitle">Welcome to FoodConnect</h2>
+        <p class="wsub">Log in to donate or request food.</p>
+
+        <div class="msg" id="wMsg" role="alert"></div>
+
+        <form id="wForm">
+          <div class="roles">
+            <label class="ro">
+              <input type="radio" name="wrole" value="donor" checked />
+              <span>🍲<b>Donor</b></span>
+            </label>
+
+            <label class="ro">
+              <input type="radio" name="wrole" value="recipient" />
+              <span>🏛️<b>Organisation</b></span>
+            </label>
+
+            <label class="ro">
+              <input type="radio" name="wrole" value="admin" />
+              <span>🛡️<b>Admin</b></span>
+            </label>
+          </div>
+
+          <label>
+            Email
+            <input type="email" id="wEmail" autocomplete="username" required />
+          </label>
+
+          <label>
+            Password
+            <input
+              type="password"
+              id="wPass"
+              autocomplete="current-password"
+              required
+            />
+          </label>
+
+          <button class="btn dk" type="submit">Log in</button>
+        </form>
+
+        <p class="wlinks">
+          New here?
+          <a href="register.html" onclick="closeWelcome()">Create an account</a>
         </p>
 
-        <!-- Donor recognition tiers -->
-        <div class="grid fame-tiers" style="margin-bottom:34px">
-
-          <div class="card tier t-Bronze" style="--c:#b0713a">
-            <div class="m">🥉</div>
-            <h3>Bronze Giver</h3>
-            <p>First donation completed</p>
-          </div>
-
-          <div class="card tier t-Silver" style="--c:#7d8a96">
-            <div class="m">🥈</div>
-            <h3>Silver Giver</h3>
-            <p>200 meals shared</p>
-          </div>
-
-          <div class="card tier t-Gold" style="--c:#d49a0d">
-            <div class="m">🥇</div>
-            <h3>Gold Giver</h3>
-            <p>1,000 meals shared</p>
-          </div>
-
-          <div class="card tier t-Platinum" style="--c:#3f6fb5">
-            <div class="m">💎</div>
-            <h3>Platinum Champion</h3>
-            <p>3,000 meals shared</p>
-          </div>
-
-        </div>
-
-        <!-- The fame.js file populates this list -->
-        <h3 class="fame-top-title" style="margin-bottom:12px">Top donors</h3>
-        <div class="fame" id="fameList"></div>
-
+        <button type="button" class="later" onclick="closeWelcome()">
+          Maybe later
+        </button>
       </div>
-    </section>
-  </main>
-
-  <!-- Footer -->
-  <footer>
-    <img class="foot-logo"
-         src="../assets/images/logo.png"
-         alt="FoodConnect logo"
-         width="56"
-         height="63">
-
-    <p><b>FoodConnect</b> is a non-profit food redistribution platform.</p>
-
-    <p>
-      Reduce food waste. Increase social impact.
-      Connect surplus food with those who need it most.
-    </p>
-  </footer>
-
-  <!-- Welcome login popup -->
-  <div class="modal"
-       id="welcome"
-       role="dialog"
-       aria-modal="true"
-       aria-labelledby="wTitle"
-       hidden>
-
-    <div class="modal-box">
-
-      <button class="modal-x"
-              type="button"
-              aria-label="Close"
-              onclick="closeWelcome()">
-        &times;
-      </button>
-
-      <img class="modal-logo"
-           src="../assets/images/logo.png"
-           alt="FoodConnect logo"
-           width="72"
-           height="80">
-
-      <h2 id="wTitle">Welcome to FoodConnect</h2>
-      <p class="wsub">Log in to donate or request food.</p>
-
-      <div class="msg" id="wMsg" role="alert"></div>
-
-      <form id="wForm">
-        <div class="roles">
-
-          <label class="ro">
-            <input type="radio" name="wrole" value="donor" checked>
-            <span>🍲<b>Donor</b></span>
-          </label>
-
-          <label class="ro">
-            <input type="radio" name="wrole" value="recipient">
-            <span>🏛️<b>Organisation</b></span>
-          </label>
-
-          <label class="ro">
-            <input type="radio" name="wrole" value="admin">
-            <span>🛡️<b>Admin</b></span>
-          </label>
-
-        </div>
-
-        <label>
-          Email
-          <input type="email"
-                 id="wEmail"
-                 autocomplete="username"
-                 required>
-        </label>
-
-        <label>
-          Password
-          <input type="password"
-                 id="wPass"
-                 autocomplete="current-password"
-                 required>
-        </label>
-
-        <button class="btn dk" type="submit">Log in</button>
-      </form>
-
-      <p class="wlinks">
-        New here?
-        <a href="register.html" onclick="closeWelcome()">Create an account</a>
-      </p>
-
-      <button type="button" class="later" onclick="closeWelcome()">
-        Maybe later
-      </button>
-
     </div>
-  </div>
 
-  <!-- Shared scripts first, then page-specific script -->
-  <script src="../scripts/common/helpers.js"></script>
-  <script src="../scripts/common/data.js"></script>
-  <script src="../scripts/common/navigation.js"></script>
-  <script src="../scripts/pages/fame.js"></script>
-  <script src="../scripts/common/welcome.js"></script>
-
-</body>
+    <!-- Shared scripts first, then page-specific script -->
+    <script src="../scripts/common/helpers.js"></script>
+    <script src="../scripts/common/data.js"></script>
+    <script src="../scripts/common/navigation.js"></script>
+    <script src="../scripts/pages/fame.js"></script>
+    <script src="../scripts/common/welcome.js"></script>
+  </body>
 </html>

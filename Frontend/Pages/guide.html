@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -25,12 +24,13 @@
 
 <body data-page="guide">
 
-  <header>
+  <header aria-label="FoodConnect site header">
     <div class="logo"
          onclick="go('home')"
          onkeydown="if(event.key==='Enter')go('home')"
          tabindex="0"
-         role="link">
+         role="link"
+         aria-label="FoodConnect home">
       <img class="logo-img"
            src="../assets/images/logo.png"
            alt=""
@@ -41,20 +41,21 @@
 
     <button class="burger"
             id="burger"
-            aria-label="Open menu"
+            type="button"
+            aria-label="Open navigation menu"
             aria-expanded="false"
             aria-controls="nav"
             onclick="toggleMenu()">
       <span></span><span></span><span></span>
     </button>
 
-    <nav id="nav"></nav>
+    <nav id="nav" aria-label="Primary navigation"></nav>
   </header>
 
-  <div class="backdrop" id="backdrop" onclick="toggleMenu(false)"></div>
+  <div class="backdrop" id="backdrop" aria-hidden="true" onclick="toggleMenu(false)"></div>
 
-  <main>
-    <section id="guide">
+  <main aria-label="FoodConnect main content">
+    <section id="guide" aria-label="Guide and food safety">
       <div class="wrap">
 
         <h2>Guide and Food Safety</h2>
@@ -62,7 +63,7 @@
           A short checklist so every meal we redistribute is safe to eat.
         </p>
 
-        <div class="grid" style="margin-bottom:30px">
+        <div class="grid" style="margin-bottom:30px" aria-label="FoodConnect guidance">
 
           <div class="card">
             <h3>For Donors</h3>
@@ -93,7 +94,7 @@
 
         </div>
 
-        <div class="faq">
+        <div class="faq" aria-label="Frequently asked questions">
 
           <details>
             <summary>Does it cost anything?</summary>
@@ -133,7 +134,7 @@
     </section>
   </main>
 
-  <footer>
+  <footer aria-label="FoodConnect information">
     <img class="foot-logo"
          src="../assets/images/logo.png"
          alt="FoodConnect logo"
@@ -158,7 +159,7 @@
 
       <button class="modal-x"
               type="button"
-              aria-label="Close"
+              aria-label="Close login dialog"
               onclick="closeWelcome()">
         &times;
       </button>
@@ -174,8 +175,8 @@
 
       <div class="msg" id="wMsg" role="alert"></div>
 
-      <form id="wForm">
-        <div class="roles">
+      <form id="wForm" aria-label="FoodConnect login form">
+        <div class="roles" role="group" aria-label="Choose account type">
 
           <label class="ro">
             <input type="radio" name="wrole" value="donor" checked>
@@ -218,7 +219,10 @@
         <a href="register.html" onclick="closeWelcome()">Create an account</a>
       </p>
 
-      <button type="button" class="later" onclick="closeWelcome()">
+      <button type="button"
+              class="later"
+              aria-label="Close login dialog and continue later"
+              onclick="closeWelcome()">
         Maybe later
       </button>
 
@@ -229,6 +233,6 @@
   <script src="../scripts/common/data.js"></script>
   <script src="../scripts/common/navigation.js"></script>
   <script src="../scripts/common/welcome.js"></script>
-
+  <script src="../scripts/common/keyboard-shortcuts.js"></script>
 </body>
 </html>

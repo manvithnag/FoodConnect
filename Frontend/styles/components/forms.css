@@ -1,4 +1,3 @@
-
 /* ==========================================================
    FORMS CSS
    Login, registration, inputs, labels and form messages
@@ -192,20 +191,34 @@ legend {
   margin: 12px 0;
 }
 
+/* Display messages only when they contain actual text */
 .msg:not(:empty) {
   display: block;
   background: #edf5ef;
   color: var(--g);
 }
 
+/* Error messages */
 .msg.error {
   background: #fbe2df;
   color: #922d23;
 }
 
+/* Success messages */
 .msg.success {
   background: #dcefe4;
   color: #185c3d;
+}
+
+/* Keep the welcome message hidden when empty */
+#wMsg:empty,
+#wMsg[hidden] {
+  display: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  min-height: 0 !important;
+  height: 0 !important;
 }
 
 /* Small hints */
@@ -235,4 +248,11 @@ legend {
   .ro {
     padding: 10px;
   }
+}
+/* Hide empty password strength message */
+#rPassStrength:empty {
+  display: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  min-height: 0 !important;
 }

@@ -144,3 +144,33 @@ body[data-page="home"] header .logo-txt,
 body[data-page="home"] header .logo-txt span {
   text-decoration: none !important;
 }
+
+/* Smooth hover scaling for homepage buttons */
+.hero-actions .btn {
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+  transform-origin: center;
+}
+
+.hero-actions .btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.18);
+}
+
+/* Keyboard accessibility */
+.hero-actions .btn:focus-visible {
+  transform: scale(1.05);
+}
+
+/* Respect reduced-motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .hero-actions .btn {
+    transition: none;
+  }
+
+  .hero-actions .btn:hover,
+  .hero-actions .btn:focus-visible {
+    transform: none;
+  }
+}

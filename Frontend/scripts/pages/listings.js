@@ -61,15 +61,27 @@ async function renderListings() {
           <p>⏰ Collect before: ${collectionTime}</p>
           ${
             showRequestButtons
-              ? `<p style="margin-top:12px">
-            <button
-              class="btn dk sm"
-              type="button"
-              data-food-id="${Number.isSafeInteger(id) && id > 0 ? id : ""}"
-              ${Number.isSafeInteger(id) && id > 0 ? "" : "disabled"}>
-              Request this food
-            </button>
-          </p>`
+              ? (() => {
+                  // The listings API should return one of these fields for the
+                  // logged-in organisation to persist the button state on reload.
+                  const alreadyRequested =
+                    food.requested_by_me === true ||
+                    food.is_requested === true ||
+                    ["pending", "approved", "completed"].includes(
+                      String(food.my_request_status || food.request_status || "").toLowerCase()
+                    );
+                  const validId = Number.isSafeInteger(id) && id > 0;
+                  return `<p style="margin-top:12px">
+                    <button
+                      class="btn dk sm"
+                      type="button"
+                      data-food-id="${validId ? id : ""}"
+                      ${!validId || alreadyRequested ? "disabled" : ""}
+                      ${alreadyRequested ? 'data-requested="true"' : ""}>
+                      ${alreadyRequested ? "Requested" : "Request this food"}
+                    </button>
+                  </p>`;
+                })()
               : ""
           }
         </article>
@@ -103,23 +115,36 @@ if (listingsGrid) {
         body: JSON.stringify({ food_id: foodId }),
       });
 
+      // Keep the button disabled after a successful request to prevent duplicates.
+      button.textContent = "Requested";
+      button.disabled = true;
+      button.dataset.requested = "true";
+
       if (listingsMessage) {
         listingsMessage.textContent = "Food request submitted successfully.";
         listingsMessage.style.display = "block";
         listingsMessage.className = "msg";
       }
     } catch (error) {
+      // If the backend says the organisation already requested this listing,
+      // reflect that state rather than allowing another click.
+      const errorMessage = error.message || "Unable to submit your request. Please log in and try again.";
+      if (/already requested|already request|duplicate/i.test(errorMessage)) {
+        button.textContent = "Requested";
+        button.disabled = true;
+        button.dataset.requested = "true";
+      } else {
+        button.disabled = false;
+      }
+
       if (listingsMessage) {
-        listingsMessage.textContent =
-          error.message ||
-          "Unable to submit your request. Please log in and try again.";
+        listingsMessage.textContent = errorMessage;
         listingsMessage.style.display = "block";
         listingsMessage.className = "msg err";
       }
-    } finally {
-      button.disabled = false;
     }
   });
 }
 
 document.addEventListener("DOMContentLoaded", renderListings);
+s

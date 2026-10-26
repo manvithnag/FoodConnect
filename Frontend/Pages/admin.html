@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,36 +12,36 @@
 <body data-page="admin">
   <a class="skip-link" href="#main">Skip to main content</a>
 
-  <header>
-    <div class="brand">FoodConnect <span class="muted">/ Admin</span></div>
-    <div class="header-actions">
-      <button class="button secondary" id="refreshButton" type="button">
+  <header aria-label="FoodConnect administrator header">
+    <div class="brand" aria-label="FoodConnect administrator">FoodConnect <span class="muted">/ Admin</span></div>
+    <div class="header-actions" aria-label="Administrator actions">
+      <button class="button secondary" id="refreshButton" type="button" aria-label="Refresh dashboard data">
         Refresh data
       </button>
-      <button class="button" id="logoutButton" type="button">
+      <button class="button" id="logoutButton" type="button" aria-label="Log out of administrator account">
         Logout
       </button>
     </div>
   </header>
 
-  <main id="main">
+  <main id="main" aria-label="Administrator dashboard">
     <h1>Admin Dashboard</h1>
     <p class="intro muted">Read-only overview of FoodConnect activity.</p>
 
-    <div id="pageMessage" class="notice" role="status" aria-live="polite">
+    <div id="pageMessage" class="notice" role="status" aria-live="polite" aria-label="Administrator session status">
       Checking your admin session…
     </div>
 
     <section id="dashboardContent" hidden aria-label="Platform overview">
       <p id="welcomeMessage" class="muted"></p>
-      <p id="lastUpdated" class="muted"></p>
+      <p id="lastUpdated" class="muted" aria-label="Last dashboard update time"></p>
 
       <h2>Platform statistics</h2>
-      <div class="stats" id="statsGrid"></div>
+      <div class="stats" id="statsGrid" aria-label="Platform statistics"></div>
 
       <section class="panel" aria-labelledby="usersHeading">
         <h2 id="usersHeading">Recent registered users</h2>
-        <div class="table-wrap">
+        <div class="table-wrap" aria-label="Recent registered users table">
           <table>
             <thead>
               <tr>
@@ -62,7 +61,7 @@
 
       <section class="panel" aria-labelledby="listingsHeading">
         <h2 id="listingsHeading">Recent food listings</h2>
-        <div class="table-wrap">
+        <div class="table-wrap" aria-label="Recent food listings table">
           <table>
             <thead>
               <tr>
@@ -83,7 +82,7 @@
 
       <section class="panel" aria-labelledby="requestsHeading">
         <h2 id="requestsHeading">Recent food requests</h2>
-        <div class="table-wrap">
+        <div class="table-wrap" aria-label="Recent food requests table">
           <table>
             <thead>
               <tr>
@@ -102,6 +101,6 @@
     </section>
   </main>
 
-  <footer>FoodConnect · Administrator access</footer>
+  <footer aria-label="FoodConnect administrator information">FoodConnect · Administrator access</footer>
 </body>
 </html>

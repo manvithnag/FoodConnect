@@ -1,23 +1,26 @@
 /* ==========================================================
    DASHBOARD CSS
-   Dashboard layout, donation statistics, forms and certificate
+   Dashboard layout, summary cards, actions and data sections
    ========================================================== */
 
+/* Dashboard main section */
 #dash {
   padding: 20px 0 50px;
 }
 
+/* Dashboard heading */
 #dash h1,
 #dash h2 {
   color: var(--g);
   margin-bottom: 14px;
 }
 
+/* Dashboard introductory text */
 #dash .lead {
-  margin-bottom: 24px;
+  margin-bottom: 28px;
 }
 
-/* Dashboard summary cards (kept for reuse elsewhere) */
+/* Dashboard summary grid */
 .dash-stats {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -25,6 +28,7 @@
   margin: 24px 0 32px;
 }
 
+/* Individual statistic */
 .dash-stat {
   background: #fff;
   border: 1px solid var(--line);
@@ -42,151 +46,31 @@
   display: block;
   margin-top: 6px;
   color: var(--g);
-  font: 800 1.8rem 'Bricolage Grotesque', sans-serif;
+  font:
+    800 1.8rem "Bricolage Grotesque",
+    sans-serif;
 }
 
-/* Dashboard panels */
+/* Dashboard content panels */
 .dash-panel {
   background: #fff;
   border: 1px solid var(--line);
   border-radius: 16px;
   padding: 24px;
   margin-bottom: 24px;
-  box-shadow: 0 8px 24px rgba(20, 55, 42, 0.045);
 }
 
-.dash-panel h2,
 .dash-panel h3 {
   color: var(--g);
-  margin-bottom: 10px;
+  margin-bottom: 14px;
 }
 
-.stats-intro {
-  margin-bottom: 12px;
-  color: var(--mut);
-}
-
-.dashboard-table-wrap {
-  width: 100%;
-  overflow-x: auto;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-}
-
-#dash table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 0;
-}
-
-#dash th,
-#dash td {
-  text-align: left;
-  padding: 13px 16px;
-  border-bottom: 1px solid var(--line);
-}
-
-#dash th {
-  background: #edf3ee;
-  color: var(--g);
-  font-weight: 700;
-}
-
-#dash tbody tr:last-child td {
-  border-bottom: 0;
-}
-
-#dash tbody tr:nth-child(even) {
-  background: #fbfcfa;
-}
-
-.donation-stat-count {
-  color: var(--g);
-  font-weight: 800;
-  font-variant-numeric: tabular-nums;
-}
-
-.stats-note {
-  margin-top: 12px;
-  color: var(--mut);
-  font-size: 0.92rem;
-}
-
-/* Add-food form toggle and panel */
-.add-food-panel > p {
-  color: var(--mut);
-  margin-bottom: 16px;
-}
-
-.add-food-form-panel {
-  margin-top: 20px;
-  padding-top: 20px;
-  border-top: 1px solid var(--line);
-}
-
-.add-food-form-panel[hidden] {
-  display: none !important;
-}
-
-.food-form-label {
-  display: block;
-  margin-bottom: 16px;
-  color: var(--g);
-  font-weight: 600;
-}
-
-.food-form-control {
-  display: block;
-  width: 100%;
-  max-width: 100%;
-  margin-top: 7px;
-  padding: 12px 13px;
-  border: 1px solid var(--line);
-  border-radius: 9px;
-  background: #fff;
-  color: inherit;
-  font: inherit;
-  box-sizing: border-box;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.food-form-control:focus {
-  outline: none;
-  border-color: var(--g);
-  box-shadow: 0 0 0 3px rgba(30, 92, 68, 0.12);
-}
-
-.food-form-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  align-items: center;
-}
-
-.food-form-cancel {
-  border: 1px solid var(--line);
-  background: #fff;
-  color: var(--g);
-}
-
-.form-status-message {
-  margin-top: 12px;
-  color: var(--g);
-}
-
-button:disabled {
-  opacity: 0.65;
-  cursor: not-allowed;
-}
-
-/* Certificate of appreciation */
 .certificate-panel {
   margin-top: 20px;
-  padding: 24px;
+  padding: 22px;
   border: 1px solid #e2cf9b;
   border-radius: 16px;
   background: linear-gradient(135deg, #fffdf6, #f5f8f2);
-  box-shadow: 0 8px 24px rgba(91, 72, 25, 0.06);
 }
 
 .certificate-panel h2 {
@@ -225,14 +109,37 @@ button:disabled {
   border-bottom: 0;
 }
 
+.dashboard-table-wrap {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+/* Dashboard tables */
+#dash table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0;
+}
+
+#dash th,
+#dash td {
+  text-align: left;
+  padding: 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+#dash th {
+  background: #edf3ee;
+  color: var(--g);
+}
+
 /* Tablet */
 @media (max-width: 900px) {
   .dash-stats {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .dash-panel,
-  .certificate-panel {
+  .dash-panel {
     padding: 20px;
   }
 }
@@ -247,9 +154,9 @@ button:disabled {
     padding: 16px;
   }
 
-  .dash-panel,
-  .certificate-panel {
+  .dash-panel {
     padding: 16px;
+    overflow-wrap: anywhere;
   }
 
   .dash-list-item {
@@ -257,104 +164,7 @@ button:disabled {
     flex-direction: column;
   }
 
-  #dash th,
-  #dash td {
-    padding: 11px 12px;
-  }
-
-  .food-form-actions {
-    align-items: stretch;
-    flex-direction: column;
-  }
-
-  .food-form-actions .btn {
-    width: 100%;
-  }
-}
-
-/* Incoming organisation request confirmation popup */
-.request-confirm-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  background: rgba(13, 31, 24, 0.62);
-}
-
-.request-confirm-dialog {
-  width: min(100%, 620px);
-  max-height: min(85vh, 760px);
-  overflow-y: auto;
-  padding: 26px;
-  border-radius: 18px;
-  background: #fff;
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.25);
-}
-
-.request-confirm-dialog h2 {
-  margin: 0 0 8px;
-  color: var(--g);
-}
-
-.request-confirm-dialog > p {
-  color: var(--mut);
-}
-
-.incoming-request-card {
-  margin-top: 16px;
-  padding: 16px;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background: #fbfcfa;
-}
-
-.incoming-request-card h3 {
-  margin: 0 0 8px;
-  color: var(--g);
-}
-
-.incoming-request-card p {
-  margin: 5px 0;
-}
-
-.request-action-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 14px;
-}
-
-.request-reject-button {
-  border: 1px solid #d9a7a7;
-  background: #fff;
-  color: #9d2d2d;
-}
-
-.request-action-message {
-  margin: 16px 0 8px;
-  color: var(--g);
-}
-
-.request-popup-close {
-  margin-top: 12px;
-  border: 0;
-  background: transparent;
-  color: var(--mut);
-  text-decoration: underline;
-  cursor: pointer;
-}
-
-@media (max-width: 600px) {
-  .request-confirm-dialog {
-    padding: 18px;
-  }
-  .request-action-buttons {
-    flex-direction: column;
-  }
-  .request-action-buttons .btn {
-    width: 100%;
+  #dash table {
+    min-width: 520px;
   }
 }

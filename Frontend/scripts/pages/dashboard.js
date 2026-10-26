@@ -1,12 +1,10 @@
 /*
  * FoodConnect - Dashboard
- * Donors can view donation statistics, add food listings, and download a certificate.
- * Organisations can browse available food.
+ * Donor can add food listings.
+ * Organisation can view available food and request it.
  */
 
 const dashboardBody = $("#dashBody");
-const knownIncomingRequestIds = new Set();
-let incomingRequestPollingStarted = false;
 
 async function loadDashboard() {
   if (!dashboardBody) return;
@@ -25,19 +23,20 @@ async function loadDashboard() {
     dashboardBody.appendChild(heading);
 
     const description = document.createElement("p");
-    description.className = "lead";
     description.textContent = `Account type: ${role}`;
     dashboardBody.appendChild(description);
 
     if (role === "donor") {
-      const donations = getDonorDonationData(result);
-      const suppliedStats = result.stats || result.statistics || {};
-      renderDonorStatistics(donations, suppliedStats, user);
+      renderDonorOverview(
+        result.donor_stats || {},
+        result.donation_history || [],
+      );
+      renderDonorListingsLink();
       renderDonorForm();
-      renderDonorCertificate(user.name || "FoodConnect Donor");
-      const incomingRequests = getIncomingRequests(result);
-      renderIncomingRequestPopup(incomingRequests);
-      startIncomingRequestPolling();
+      renderDonorCertificate(
+        user.name || "FoodConnect Donor",
+        result.donor_category || "Bronze Giver",
+      );
     } else if (role === "organisation") {
       renderOrganisationDashboard();
     } else {
@@ -64,280 +63,131 @@ async function loadDashboard() {
   }
 }
 
-/*
- * Use donation/listing data if dashboard.php already returns it.
- * The current frontend only guarantees result.user, so do not call a
- * made-up endpoint or pretend statistics exist when the API has not supplied them.
- */
-function getDonorDonationData(result) {
-  const possibleArrays = [
-    result.donations,
-    result.listings,
-    result.foodListings,
-    result.food_listings,
-    result.user && result.user.donations,
-    result.user && result.user.listings,
-  ];
-
-  return possibleArrays.find(Array.isArray) || [];
-}
-
-function normaliseStatus(item) {
-  return String(
-    item.status || item.state || item.listing_status || item.collection_status || ""
-  ).trim().toLowerCase();
-}
-
-function getIncomingRequests(result) {
-  const candidates = [
-    result.incomingRequests,
-    result.incoming_requests,
-    result.pendingRequests,
-    result.pending_requests,
-    result.requests,
-  ];
-  const requests = candidates.find(Array.isArray) || [];
-  return requests.filter((request) => {
-    const status = String(request.status || request.request_status || "pending").toLowerCase();
-    return status === "pending" || status === "requested";
+function renderDonorOverview(stats, history) {
+  const statsSection = document.createElement("section");
+  statsSection.className = "card dash-panel";
+  const statsHeading = document.createElement("h2");
+  statsHeading.textContent = "Your Donation Statistics";
+  const statsTable = document.createElement("table");
+  const statsHead = document.createElement("thead");
+  const statsHeadRow = document.createElement("tr");
+  ["Donation statistic", "Value"].forEach((label) => {
+    const cell = document.createElement("th");
+    cell.scope = "col";
+    cell.textContent = label;
+    statsHeadRow.appendChild(cell);
   });
-}
-
-function renderDonorStatistics(donations, suppliedStats, user = {}) {
-  const section = document.createElement("section");
-  section.className = "card dash-panel donor-statistics";
-
-  const heading = document.createElement("h2");
-  heading.textContent = "Your Donation Statistics";
-
-  const totalFromApi = Number(
-    suppliedStats.totalDonations ?? suppliedStats.total_donations ?? suppliedStats.total ??
-    user.totalDonations ?? user.total_donations
-  );
-  const total = Number.isFinite(totalFromApi) && totalFromApi >= 0
-    ? totalFromApi
-    : donations.length;
-
-  const rankValue = suppliedStats.donorRank ?? suppliedStats.donor_rank ??
-    suppliedStats.rank ?? user.donorRank ?? user.donor_rank ?? user.rank;
-  const rank = rankValue === undefined || rankValue === null || String(rankValue).trim() === ""
-    ? "Not ranked yet"
-    : (typeof rankValue === "number" || /^#?\d+$/.test(String(rankValue).trim())
-        ? `#${String(rankValue).replace(/^#/, "")}`
-        : String(rankValue));
-
-  const tableWrap = document.createElement("div");
-  tableWrap.className = "dashboard-table-wrap";
-
-  const table = document.createElement("table");
-  table.className = "donation-stats-table";
-
-  const thead = document.createElement("thead");
-  const headerRow = document.createElement("tr");
-  ["Donation statistic", "Value"].forEach((labelText) => {
-    const th = document.createElement("th");
-    th.scope = "col";
-    th.textContent = labelText;
-    headerRow.appendChild(th);
-  });
-  thead.appendChild(headerRow);
-
-  const tbody = document.createElement("tbody");
-  [["Total donations", String(total)], ["Donor rank", rank]].forEach(([labelText, value]) => {
+  statsHead.appendChild(statsHeadRow);
+  const statsBody = document.createElement("tbody");
+  [
+    ["Total donations", Number(stats.total_donations) || 0],
+    [
+      "Donor rank",
+      stats.donor_rank ? `#${stats.donor_rank}` : "Not ranked yet",
+    ],
+  ].forEach(([label, value]) => {
     const row = document.createElement("tr");
     const labelCell = document.createElement("td");
-    labelCell.textContent = labelText;
     const valueCell = document.createElement("td");
-    valueCell.className = "donation-stat-count";
-    valueCell.textContent = value;
-    if (labelText === "Total donations") valueCell.dataset.totalDonations = "true";
-    if (labelText === "Donor rank") valueCell.dataset.donorRank = "true";
+    labelCell.textContent = label;
+    valueCell.textContent = String(value);
     row.append(labelCell, valueCell);
-    tbody.appendChild(row);
+    statsBody.appendChild(row);
   });
+  statsTable.append(statsHead, statsBody);
+  statsSection.append(statsHeading, statsTable);
 
-  table.append(thead, tbody);
-  tableWrap.appendChild(table);
-  section.append(heading, tableWrap);
+  const historySection = document.createElement("section");
+  historySection.className = "card dash-panel";
+  const historyHeading = document.createElement("h2");
+  historyHeading.textContent = "Donation History";
+  const historyDescription = document.createElement("p");
+  historyDescription.textContent =
+    "All food listings you have added and their current status.";
+  const historyTable = document.createElement("table");
+  const historyHead = document.createElement("thead");
+  const historyHeadRow = document.createElement("tr");
+  ["Food donation", "Date added", "Status"].forEach((label) => {
+    const cell = document.createElement("th");
+    cell.scope = "col";
+    cell.textContent = label;
+    historyHeadRow.appendChild(cell);
+  });
+  historyHead.appendChild(historyHeadRow);
+  const historyBody = document.createElement("tbody");
 
-  if (rank === "Not ranked yet") {
-    const note = document.createElement("p");
-    note.className = "stats-note";
-    note.textContent = "Your rank will appear when donor ranking data is provided by the dashboard API.";
-    section.appendChild(note);
+  if (history.length) {
+    history.forEach((donation) => {
+      const row = document.createElement("tr");
+      const foodCell = document.createElement("td");
+      const dateCell = document.createElement("td");
+      const statusCell = document.createElement("td");
+      foodCell.textContent = donation.title || "Food listing";
+      const date = donation.created_at
+        ? new Date(String(donation.created_at).replace(" ", "T"))
+        : null;
+      dateCell.textContent =
+        date && !Number.isNaN(date.getTime())
+          ? new Intl.DateTimeFormat(undefined, {
+              day: "numeric",
+              month: "short",
+              year: "numeric",
+            }).format(date)
+          : "Date unavailable";
+      const status = donation.donation_completed
+        ? "Completed"
+        : String(donation.status || "Available");
+      statusCell.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+      row.append(foodCell, dateCell, statusCell);
+      historyBody.appendChild(row);
+    });
+  } else {
+    const row = document.createElement("tr");
+    const cell = document.createElement("td");
+    cell.colSpan = 3;
+    cell.textContent = "You have not added any food listings yet.";
+    row.appendChild(cell);
+    historyBody.appendChild(row);
   }
-  dashboardBody.appendChild(section);
+
+  historyTable.append(historyHead, historyBody);
+  const tableWrap = document.createElement("div");
+  tableWrap.className = "dashboard-table-wrap";
+  tableWrap.appendChild(historyTable);
+  historySection.append(historyHeading, historyDescription, tableWrap);
+  dashboardBody.append(statsSection, historySection);
 }
-
-function getRequestKey(request) {
-  return String(request.request_id ?? request.requestId ?? request.id ?? request.id_request ??
-    request.listing_id ?? request.listingId ?? request.food_id ?? "");
-}
-
-function startIncomingRequestPolling() {
-  if (incomingRequestPollingStarted) return;
-  incomingRequestPollingStarted = true;
-
-  // Check for new requests while the donor leaves the dashboard open.
-  window.setInterval(async () => {
-    try {
-      const result = await apiRequest("dashboard.php");
-      const requests = getIncomingRequests(result);
-      const newRequests = requests.filter((request) => {
-        const key = getRequestKey(request);
-        return key && !knownIncomingRequestIds.has(key);
-      });
-      if (newRequests.length) renderIncomingRequestPopup(newRequests);
-
-      const stats = result.stats || result.statistics || {};
-      const total = stats.totalDonations ?? stats.total_donations ?? stats.total ??
-        (result.user && (result.user.totalDonations ?? result.user.total_donations));
-      const totalCell = dashboardBody.querySelector("[data-total-donations='true']");
-      if (totalCell && total !== undefined && total !== null && Number.isFinite(Number(total))) {
-        totalCell.textContent = String(Number(total));
-      }
-      const rank = stats.donorRank ?? stats.donor_rank ?? stats.rank ??
-        (result.user && (result.user.donorRank ?? result.user.donor_rank ?? result.user.rank));
-      const rankCell = dashboardBody.querySelector("[data-donor-rank='true']");
-      if (rankCell && rank !== undefined && rank !== null && String(rank).trim() !== "") {
-        rankCell.textContent = (typeof rank === "number" || /^#?\d+$/.test(String(rank).trim()))
-          ? `#${String(rank).replace(/^#/, "")}` : String(rank);
-      }
-    } catch (_) {
-      // Keep the dashboard usable if a background refresh temporarily fails.
-    }
-  }, 30000);
-}
-
-function renderIncomingRequestPopup(requests) {
-  if (!requests.length) return;
-  requests.forEach((request) => {
-    const key = getRequestKey(request);
-    if (key) knownIncomingRequestIds.add(key);
-  });
-
-  const overlay = document.createElement("div");
-  overlay.className = "request-confirm-overlay";
-  overlay.setAttribute("role", "dialog");
-  overlay.setAttribute("aria-modal", "true");
-  overlay.setAttribute("aria-labelledby", "incomingRequestTitle");
-
-  const dialog = document.createElement("section");
-  dialog.className = "request-confirm-dialog";
+function renderDonorListingsLink() {
+  const section = document.createElement("section");
+  section.className = "card dash-panel";
 
   const heading = document.createElement("h2");
-  heading.id = "incomingRequestTitle";
-  heading.textContent = "New food request";
+  heading.textContent = "Add Food Listing";
 
-  const intro = document.createElement("p");
-  intro.textContent = "An organisation has requested your food donation. Please confirm or reject the request.";
-  dialog.append(heading, intro);
+  const description = document.createElement("p");
+  description.textContent = "Go to the form to publish a food donation.";
 
-  const statusMessage = document.createElement("p");
-  statusMessage.className = "request-action-message";
-  statusMessage.setAttribute("role", "status");
-  statusMessage.setAttribute("aria-live", "polite");
-
-  requests.forEach((request) => {
-    const card = document.createElement("article");
-    card.className = "incoming-request-card";
-
-    const foodName = document.createElement("h3");
-    foodName.textContent = request.food_name || request.title || request.listing_title || request.foodTitle || "Food donation";
-
-    const org = document.createElement("p");
-    org.textContent = `Organisation: ${request.organisation_name || request.organization_name || request.org_name || request.requester_name || request.user_name || "Organisation"}`;
-
-    const quantity = request.qty || request.quantity || request.servings;
-    const quantityText = document.createElement("p");
-    quantityText.textContent = quantity ? `Quantity: ${quantity}` : "";
-    card.append(foodName, org);
-    if (quantity) card.appendChild(quantityText);
-
-    const actions = document.createElement("div");
-    actions.className = "request-action-buttons";
-
-    const confirmButton = document.createElement("button");
-    confirmButton.type = "button";
-    confirmButton.className = "btn dk";
-    confirmButton.textContent = "Confirm donation";
-
-    const rejectButton = document.createElement("button");
-    rejectButton.type = "button";
-    rejectButton.className = "btn request-reject-button";
-    rejectButton.textContent = "Reject";
-
-    const requestId = request.request_id ?? request.requestId ?? request.id ?? request.id_request;
-    const listingId = request.listing_id ?? request.listingId ?? request.food_id;
-
-    async function respondToRequest(action, button) {
-      if (requestId === undefined && listingId === undefined) {
-        statusMessage.textContent = "This request has no ID. Please update the dashboard API to include request_id.";
-        return;
-      }
-      confirmButton.disabled = true;
-      rejectButton.disabled = true;
-      statusMessage.textContent = action === "confirm" ? "Confirming donation…" : "Rejecting request…";
-      try {
-        const response = await apiRequest("requests.php", {
-          method: "POST",
-          body: JSON.stringify({
-            action,
-            request_id: requestId,
-            listing_id: listingId,
-          }),
-        });
-        statusMessage.textContent = response.message || (action === "confirm" ? "Donation confirmed." : "Request rejected.");
-        card.remove();
-
-        // Count only confirmed donations, never listings that were merely published.
-        if (action === "confirm") {
-          const totalCell = dashboardBody.querySelector("[data-total-donations='true']");
-          if (totalCell) {
-            const current = Number.parseInt(totalCell.textContent, 10);
-            if (Number.isFinite(current)) totalCell.textContent = String(current + 1);
-          }
-        }
-        if (!dialog.querySelector(".incoming-request-card")) {
-          const closeButton = document.createElement("button");
-          closeButton.type = "button";
-          closeButton.className = "btn dk";
-          closeButton.textContent = "Done";
-          closeButton.addEventListener("click", () => overlay.remove());
-          dialog.appendChild(closeButton);
-        }
-      } catch (error) {
-        statusMessage.textContent = error.message || "Could not update this request. Please try again.";
-        confirmButton.disabled = false;
-        rejectButton.disabled = false;
-      }
-    }
-
-    confirmButton.addEventListener("click", () => respondToRequest("confirm", confirmButton));
-    rejectButton.addEventListener("click", () => respondToRequest("reject", rejectButton));
-    actions.append(confirmButton, rejectButton);
-    card.appendChild(actions);
-    dialog.appendChild(card);
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "btn dk";
+  button.textContent = "Add Food Listing";
+  button.addEventListener("click", () => {
+    const formSection = document.getElementById("addFoodSection");
+    if (!formSection) return;
+    formSection.hidden = false;
+    formSection.scrollIntoView({ behavior: "smooth", block: "start" });
+    formSection.querySelector("input")?.focus({ preventScroll: true });
   });
 
-  const closeButton = document.createElement("button");
-  closeButton.type = "button";
-  closeButton.className = "request-popup-close";
-  closeButton.textContent = "Close for now";
-  closeButton.addEventListener("click", () => overlay.remove());
-
-  dialog.append(statusMessage, closeButton);
-  overlay.appendChild(dialog);
-  document.body.appendChild(overlay);
-  closeButton.focus();
+  section.append(heading, description, button);
+  dashboardBody.appendChild(section);
 }
-
-function renderDonorCertificate(donorName) {
+function renderDonorCertificate(donorName, donorCategory) {
   const section = document.createElement("section");
   section.className = "card certificate-panel";
 
   const heading = document.createElement("h2");
-  heading.textContent = "Your Certificate of Appreciation";
+  heading.textContent = "Your certificate of appreciation";
 
   const description = document.createElement("p");
   description.textContent =
@@ -346,21 +196,15 @@ function renderDonorCertificate(donorName) {
   const button = document.createElement("button");
   button.type = "button";
   button.className = "btn dk";
-  button.textContent = "Download Certificate";
+  button.textContent = "Download certificate";
   button.addEventListener("click", () => {
     const certificateWindow = window.open("", "_blank", "width=900,height=680");
-    if (!certificateWindow) {
-      description.textContent =
-        "Please allow pop-ups for this site to download your certificate.";
-      return;
-    }
+    if (!certificateWindow) return;
 
-    const logoUrl = new URL("../assets/images/logo.png", window.location.href).href;
-    const safeName = typeof esc === "function"
-      ? esc(donorName)
-      : String(donorName).replace(/[&<>"']/g, (char) => ({
-          "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
-        }[char]));
+    const logoUrl = new URL("../assets/images/logo.png", window.location.href)
+      .href;
+    const safeName = esc(donorName);
+    const safeCategory = esc(donorCategory);
     const issueDate = new Intl.DateTimeFormat(undefined, {
       year: "numeric",
       month: "long",
@@ -368,7 +212,7 @@ function renderDonorCertificate(donorName) {
     }).format(new Date());
 
     certificateWindow.document.write(`<!DOCTYPE html>
-      <html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>FoodConnect Certificate</title>
+      <html lang="en"><head><meta charset="UTF-8"><title>FoodConnect Certificate</title>
       <style>
         *{box-sizing:border-box}body{margin:0;padding:20px;background:#f3f6f1;color:#183b31;font-family:Arial,sans-serif}
         .certificate{max-width:760px;margin:auto;padding:26px 30px;text-align:center;background:#fffdf7;border:7px double #c9973d;outline:1px solid #16473a;outline-offset:-17px}
@@ -380,7 +224,7 @@ function renderDonorCertificate(donorName) {
       </style></head><body><main class="certificate"><img src="${logoUrl}" alt="FoodConnect logo">
       <div class="brand">FoodConnect</div><h1>Certificate of Appreciation</h1><div class="rule"></div>
       <p class="intro">Presented with gratitude to</p><h2 class="name">${safeName}</h2>
-      <p class="copy">For being part of the FoodConnect community and helping good food reach people who need it. Your generosity makes a meaningful difference.</p>
+      <p class="copy">In recognition of your generosity as a <strong>${safeCategory}</strong>. Thank you for helping good food reach people who need it and making a meaningful difference in the FoodConnect community.</p>
       <p class="date">Issued ${issueDate}</p></main><script>window.onload=()=>window.print()<\/script></body></html>`);
     certificateWindow.document.close();
   });
@@ -391,25 +235,12 @@ function renderDonorCertificate(donorName) {
 
 function renderDonorForm() {
   const section = document.createElement("section");
-  section.className = "card dash-panel add-food-panel";
+  section.className = "card";
+  section.id = "addFoodSection";
+  section.hidden = true;
 
   const heading = document.createElement("h2");
   heading.textContent = "Add Food Listing";
-
-  const description = document.createElement("p");
-  description.textContent = "Share surplus food with people who need it.";
-
-  const toggleButton = document.createElement("button");
-  toggleButton.type = "button";
-  toggleButton.className = "btn dk";
-  toggleButton.textContent = "＋ Add Food Listing";
-  toggleButton.setAttribute("aria-expanded", "false");
-  toggleButton.setAttribute("aria-controls", "addFoodFormPanel");
-
-  const formPanel = document.createElement("div");
-  formPanel.id = "addFoodFormPanel";
-  formPanel.className = "add-food-form-panel";
-  formPanel.hidden = true;
 
   const form = document.createElement("form");
   form.id = "addFoodForm";
@@ -417,7 +248,7 @@ function renderDonorForm() {
   const fields = [
     { name: "title", label: "Food name", type: "text", required: true },
     { name: "description", label: "Description", type: "textarea" },
-    { name: "kind", label: "Food category", type: "select", required: true },
+    { name: "kind", label: "Food category", type: "text" },
     { name: "qty", label: "Quantity / servings", type: "text", required: true },
     { name: "addr", label: "Pickup address", type: "text", required: true },
     {
@@ -430,41 +261,24 @@ function renderDonorForm() {
 
   fields.forEach((field) => {
     const label = document.createElement("label");
-    label.className = "food-form-label";
     label.textContent = field.label;
+    label.style.display = "block";
+    label.style.marginBottom = "12px";
 
-    let input;
-    if (field.type === "textarea") {
-      input = document.createElement("textarea");
-      input.rows = 3;
-    } else if (field.type === "select") {
-      input = document.createElement("select");
+    const input = document.createElement(
+      field.type === "textarea" ? "textarea" : "input",
+    );
 
-      const placeholder = document.createElement("option");
-      placeholder.value = "";
-      placeholder.textContent = "Select food category";
-      placeholder.disabled = true;
-      placeholder.selected = true;
-      input.appendChild(placeholder);
-
-      [
-        { value: "veg", label: "Veg" },
-        { value: "non-veg", label: "Non-Veg" },
-      ].forEach((optionData) => {
-        const option = document.createElement("option");
-        option.value = optionData.value;
-        option.textContent = optionData.label;
-        input.appendChild(option);
-      });
-    } else {
-      input = document.createElement("input");
+    if (field.type !== "textarea") {
       input.type = field.type;
     }
 
     input.name = field.name;
     input.required = Boolean(field.required);
-    input.className = "food-form-control";
-    input.id = `food-${field.name}`;
+    input.style.display = "block";
+    input.style.width = "100%";
+    input.style.marginTop = "6px";
+    input.style.padding = "10px";
 
     if (field.name === "collect_before") {
       const now = new Date();
@@ -472,59 +286,29 @@ function renderDonorForm() {
       input.min = now.toISOString().slice(0, 16);
     }
 
-    label.htmlFor = input.id;
     label.appendChild(input);
     form.appendChild(label);
   });
 
   const message = document.createElement("p");
   message.id = "addFoodMessage";
-  message.className = "form-status-message";
   message.setAttribute("role", "status");
-  message.setAttribute("aria-live", "polite");
 
-  const buttonRow = document.createElement("div");
-  buttonRow.className = "food-form-actions";
+  const button = document.createElement("button");
+  button.type = "submit";
+  button.className = "btn dk";
+  button.textContent = "Publish Food Listing";
 
-  const submitButton = document.createElement("button");
-  submitButton.type = "submit";
-  submitButton.className = "btn dk";
-  submitButton.textContent = "Publish Food Listing";
-
-  const cancelButton = document.createElement("button");
-  cancelButton.type = "button";
-  cancelButton.className = "btn food-form-cancel";
-  cancelButton.textContent = "Cancel";
-  cancelButton.addEventListener("click", () => {
-    form.reset();
-    message.textContent = "";
-    formPanel.hidden = true;
-    toggleButton.setAttribute("aria-expanded", "false");
-    toggleButton.textContent = "＋ Add Food Listing";
-    toggleButton.focus();
-  });
-
-  buttonRow.append(submitButton, cancelButton);
-  form.append(buttonRow, message);
-  formPanel.appendChild(form);
-
-  toggleButton.addEventListener("click", () => {
-    const willOpen = formPanel.hidden;
-    formPanel.hidden = !willOpen;
-    toggleButton.setAttribute("aria-expanded", String(willOpen));
-    toggleButton.textContent = willOpen ? "− Close Food Listing Form" : "＋ Add Food Listing";
-    if (willOpen) {
-      form.querySelector("input[name='title']").focus();
-    }
-  });
-
-  section.append(heading, description, toggleButton, formPanel);
+  form.append(button, message);
+  section.append(heading, form);
   dashboardBody.appendChild(section);
 
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
 
+    const submitButton = form.querySelector('button[type="submit"]');
     const data = Object.fromEntries(new FormData(form).entries());
+
     const deadline = new Date(data.collect_before);
 
     if (Number.isNaN(deadline.getTime()) || deadline <= new Date()) {
@@ -543,8 +327,8 @@ function renderDonorForm() {
 
       message.textContent =
         response.message || "Food listing published successfully!";
-      form.reset();
 
+      form.reset();
     } catch (error) {
       message.textContent =
         error.message || "Could not publish the food listing.";
@@ -566,7 +350,7 @@ function renderOrganisationDashboard() {
     "Browse food available for collection and submit a request.";
 
   const link = document.createElement("a");
-  link.href = "listings.html";
+  link.href = "#addFoodForm";
   link.className = "btn dk";
   link.textContent = "Browse Food Listings";
 
